@@ -121,7 +121,7 @@ body {
     }
 }
 
-/* Additional floating blobs - WAY MORE! */
+/* Additional floating blobs - WAY MORE! - MOBILE OPTIMIZED */
 .lava-blob {
     position: fixed;
     border-radius: 50%;
@@ -129,6 +129,44 @@ body {
     z-index: 0;
     filter: blur(25px);
     opacity: 0.25;
+    /* MOBILE OPTIMIZATION: Disable on low-end devices */
+    animation-play-state: running;
+}
+
+/* MOBILE PERFORMANCE: Disable heavy animations on small screens */
+@media (max-width: 768px), (max-height: 600px) {
+    .lava-blob {
+        animation-play-state: paused;
+        display: none; /* Hide completely on mobile for performance */
+    }
+    
+    .grain-overlay {
+        display: none; /* Disable grain texture on mobile */
+    }
+    
+    .bg-grid {
+        animation-play-state: paused;
+    }
+    
+    .mouse-blob {
+        display: none; /* No mouse blob on mobile */
+    }
+}
+
+/* LOW-END DEVICE OPTIMIZATIONS */
+@media (max-width: 480px) {
+    .lava-blob,
+    .grain-overlay,
+    .bg-grid,
+    .mouse-blob {
+        display: none !important;
+    }
+    
+    /* Reduce transform operations */
+    * {
+        transform-style: flat !important;
+        backface-visibility: visible !important;
+    }
 }
 
 /* Blob 1 - Large Blue - DISABLED */
@@ -1559,7 +1597,7 @@ section {
     -ms-user-select: none;
     user-select: none;
 }
-/* ===== RESPONSIVE DASHBOARD DESIGN ===== */
+/* ===== MOBILE & TOUCH OPTIMIZATIONS ===== */
 @media (max-width: 1200px) {
     .tech-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -1570,15 +1608,19 @@ section {
     }
 }
 
+/* TABLET OPTIMIZATIONS */
 @media (max-width: 768px) {
     .main-dashboard {
         gap: 0.5rem;
         padding: 0.5rem;
+        height: auto; /* Allow natural height on mobile */
+        min-height: 100vh;
     }
     
     .hero-section {
         height: auto;
         min-height: 25vh;
+        padding: 1rem 0;
     }
     
     .profile-card {
@@ -1586,6 +1628,9 @@ section {
         text-align: center;
         gap: 1.5rem;
         padding: 1.5rem;
+        /* Remove backdrop blur on mobile for performance */
+        backdrop-filter: none;
+        background: rgba(0, 0, 0, 0.8);
     }
     
     .tech-stack-section,
@@ -1593,6 +1638,8 @@ section {
         height: auto;
         min-height: 30vh;
         padding: 1.5rem;
+        /* Reduce backdrop blur */
+        backdrop-filter: blur(5px);
     }
     
     .tech-grid {
@@ -1603,6 +1650,9 @@ section {
     .projects-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
+        /* Improve touch scrolling */
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
     }
     
     .section-title {
@@ -1614,19 +1664,114 @@ section {
         font-size: 1.5rem;
         margin-bottom: 1rem;
     }
+    
+    /* TOUCH OPTIMIZATION: Larger tap targets */
+    .tech-item,
+    .social-link,
+    .project-link {
+        min-height: 44px; /* iOS recommended minimum */
+        touch-action: manipulation; /* Disable double-tap zoom */
+    }
+    
+    /* Faster transitions on mobile */
+    * {
+        transition-duration: 0.2s !important;
+    }
 }
 
+/* MOBILE PHONE OPTIMIZATIONS */
 @media (max-width: 480px) {
     .profile-card {
         padding: 1rem;
+        margin: 0.5rem;
     }
     
     .tech-stack-section,
     .projects-section {
         padding: 1rem;
+        margin: 0.5rem;
     }
     
     .tech-grid {
         grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .tech-item {
+        min-height: 50px;
+        padding: 0.75rem;
+    }
+    
+    .project-card {
+        min-height: auto;
+        padding: 1rem;
+    }
+    
+    /* Simplify text for small screens */
+    .profile-image {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .name-main {
+        font-size: 1.5rem;
+    }
+    
+    .tagline {
+        font-size: 0.8rem;
+        line-height: 1.4;
+    }
+    
+    .social-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+        min-height: 44px;
+    }
+    
+    /* Remove expensive visual effects */
+    * {
+        box-shadow: none !important;
+        text-shadow: none !important;
+        filter: none !important;
+        backdrop-filter: none !important;
+    }
+    
+    /* Simplify backgrounds */
+    .tech-stack-section,
+    .projects-section,
+    .profile-card {
+        background: rgba(0, 0, 0, 0.9) !important;
+        border: 1px solid #333 !important;
+    }
+}
+
+/* LANDSCAPE MOBILE OPTIMIZATION */
+@media (max-height: 500px) and (orientation: landscape) {
+    .main-dashboard {
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    .hero-section {
+        height: auto;
+        min-height: auto;
+        padding: 0.5rem 0;
+    }
+    
+    .profile-card {
+        grid-template-columns: auto 1fr auto;
+        text-align: left;
+    }
+    
+    .tech-stack-section {
+        height: auto;
+        min-height: auto;
+    }
+}
+
+/* HIGH DPI SCREEN OPTIMIZATIONS */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .mobile-optimized .grain-overlay {
+        display: none; /* Remove grain on high-DPI mobile screens */
     }
 }

@@ -1,17 +1,131 @@
-// Enhanced Profile Loader with Dynamic Color Theming and Advanced CORS Bypass
+// Enhanced Profile Loader with Mobile Optimizations
 class ProfileLoader {
     constructor() {
         this.github_username = 'y8olol';
-        this.discord_user_id = '218439641064275968'; // Your Discord ID
+        this.discord_user_id = '218439641064275968';
         this.colorExtractor = new ColorExtractor();
+        this.isMobile = this.detectMobile();
+        this.isLowEndDevice = this.detectLowEndDevice();
         this.init();
     }
 
+    detectMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent) || 
+               'ontouchstart' in window || 
+               window.innerWidth <= 768;
+    }
+
+    detectLowEndDevice() {
+        // Detect low-end devices for performance optimization
+        const hardwareConcurrency = navigator.hardwareConcurrency || 2;
+        const deviceMemory = navigator.deviceMemory || 2;
+        const isLowEnd = hardwareConcurrency <= 2 || deviceMemory <= 2;
+        
+        console.log(`📱 Device Info: Cores: ${hardwareConcurrency}, RAM: ${deviceMemory}GB, Low-end: ${isLowEnd}`);
+        return isLowEnd;
+    }
+
     async init() {
+        // MOBILE OPTIMIZATION: Apply performance optimizations first
+        this.applyMobileOptimizations();
+        
         await this.loadGitHubProfile();
         await this.loadGitHubRepos();
         this.setupDiscordStatus();
         this.addInteractivity();
+    }
+
+    applyMobileOptimizations() {
+        if (this.isMobile || this.isLowEndDevice) {
+            console.log('📱 Applying mobile/low-end device optimizations...');
+            
+            // Add performance CSS class
+            document.body.classList.add('mobile-optimized');
+            
+            if (this.isLowEndDevice) {
+                document.body.classList.add('low-end-device');
+            }
+            
+            // Disable heavy animations
+            this.disableHeavyAnimations();
+            
+            // Reduce animation frame rate for remaining animations
+            this.setupReducedFrameRate();
+            
+            // Disable unused event listeners
+            this.optimizeEventListeners();
+        }
+    }
+
+    disableHeavyAnimations() {
+        // Remove or pause heavy CSS animations
+        const heavyElements = document.querySelectorAll('.lava-blob, .grain-overlay, .mouse-blob');
+        heavyElements.forEach(el => {
+            el.style.display = 'none';
+        });
+        
+        // Pause background grid animation
+        const bgGrid = document.querySelector('.bg-grid');
+        if (bgGrid) {
+            bgGrid.style.animationPlayState = 'paused';
+            if (this.isLowEndDevice) {
+                bgGrid.style.display = 'none';
+            }
+        }
+        
+        // Simplify transitions
+        const style = document.createElement('style');
+        style.textContent = `
+            .mobile-optimized * {
+                transition-duration: 0.2s !important;
+                animation-duration: 0.5s !important;
+            }
+            
+            .low-end-device * {
+                transition: none !important;
+                transform: none !important;
+                filter: none !important;
+                backdrop-filter: none !important;
+                mix-blend-mode: normal !important;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    setupReducedFrameRate() {
+        // Throttle requestAnimationFrame on low-end devices
+        if (this.isLowEndDevice) {
+            const originalRAF = window.requestAnimationFrame;
+            let lastFrameTime = 0;
+            
+            window.requestAnimationFrame = (callback) => {
+                const now = performance.now();
+                if (now - lastFrameTime >= 33) { // ~30fps instead of 60fps
+                    lastFrameTime = now;
+                    return originalRAF(callback);
+                }
+                return setTimeout(() => callback(now), 16);
+            };
+        }
+    }
+
+    optimizeEventListeners() {
+        // Use passive listeners where possible
+        const originalAddEventListener = Element.prototype.addEventListener;
+        
+        Element.prototype.addEventListener = function(type, listener, options) {
+            // Make scroll and touch events passive by default
+            if (type === 'scroll' || type === 'touchstart' || type === 'touchmove' || type === 'wheel') {
+                if (typeof options === 'boolean') {
+                    options = { capture: options, passive: true };
+                } else if (!options) {
+                    options = { passive: true };
+                } else {
+                    options.passive = true;
+                }
+            }
+            return originalAddEventListener.call(this, type, listener, options);
+        };
     }
 
     async loadGitHubProfile() {
@@ -1353,55 +1467,38 @@ class ProfileLoader {
             });
         });
 
-        // Add 3D effects to ALL cards and interactive elements
-        document.querySelectorAll('.project-card').forEach(card => {
-            this.add3DEffect(card, 1.2); // Slightly more intense for projects
-        });
+        // MOBILE OPTIMIZATION: Disable 3D effects on mobile/low-end devices
+        if (!this.isMobile && !this.isLowEndDevice) {
+            // Add 3D effects only on desktop with good performance
+            document.querySelectorAll('.project-card').forEach(card => {
+                this.add3DEffect(card, 1.2);
+            });
 
-        // Add 3D effect to profile card
-        const profileCard = document.querySelector('.profile-card');
-        if (profileCard) {
-            this.add3DEffect(profileCard, 0.4); // Subtle but noticeable
+            const profileCard = document.querySelector('.profile-card');
+            if (profileCard) {
+                this.add3DEffect(profileCard, 0.4);
+            }
+
+            document.querySelectorAll('.social-link').forEach(link => {
+                this.add3DEffect(link, 0.8);
+            });
+
+            const ctaButton = document.querySelector('.cta-button');
+            if (ctaButton) {
+                this.add3DEffect(ctaButton, 0.6);
+            }
+
+            const profileImage = document.querySelector('.profile-image');
+            if (profileImage) {
+                this.add3DEffect(profileImage, 0.7);
+            }
+
+            document.querySelectorAll('.project-link').forEach(link => {
+                this.add3DEffect(link, 0.4);
+            });
+        } else {
+            console.log('📱 Mobile/Low-end device detected: 3D effects disabled for performance');
         }
-
-        // Add 3D effects to social links
-        document.querySelectorAll('.social-link').forEach(link => {
-            this.add3DEffect(link, 0.8);
-        });
-
-        // Add 3D effects to CTA button
-        const ctaButton = document.querySelector('.cta-button');
-        if (ctaButton) {
-            this.add3DEffect(ctaButton, 0.6);
-        }
-
-        // Add 3D effects to status indicator - REMOVED (causes unwanted glow)
-        // const statusIndicator = document.querySelector('.status-indicator');
-        // if (statusIndicator) {
-        //     this.add3DEffect(statusIndicator, 0.5);
-        // }
-
-        // NEW: Add 3D effects to MORE elements (but exclude text-only elements)
-        // Section titles - REMOVED (text only)
-        // document.querySelectorAll('.section-title').forEach(title => {
-        //     this.add3DEffect(title, 0.3);
-        // });
-
-        // Profile image
-        const profileImage = document.querySelector('.profile-image');
-        if (profileImage) {
-            this.add3DEffect(profileImage, 0.7);
-        }
-
-        // Tech icons inside cards - REMOVED to prevent flickering
-        // document.querySelectorAll('.tech-icon').forEach(icon => {
-        //     this.add3DEffect(icon, 0.7);
-        // });
-
-        // Project links - Re-enabled for 3D effects
-        document.querySelectorAll('.project-link').forEach(link => {
-            this.add3DEffect(link, 0.4);
-        });
 
         // Language tags - REMOVED (causes unwanted glow effects on project cards)
         // document.querySelectorAll('.project-language').forEach(lang => {
@@ -1433,8 +1530,10 @@ class ProfileLoader {
         //     this.add3DEffect(contactText, 0.2);
         // }
 
-        // Parallax effect for background
-        window.addEventListener('scroll', this.handleScroll.bind(this));
+        // Parallax effect for background - OPTIMIZED for mobile
+        if (!this.isMobile) {
+            window.addEventListener('scroll', this.handleScroll.bind(this), { passive: true });
+        }
 
         // Add keyboard navigation
         document.addEventListener('keydown', (e) => {
@@ -1443,8 +1542,10 @@ class ProfileLoader {
             }
         });
 
-        // Enhanced cursor effect
-        this.setupCursorEffect();
+        // Enhanced cursor effect - DISABLED on mobile
+        if (!this.isMobile) {
+            this.setupCursorEffect();
+        }
     }
 
     handleScroll() {
@@ -1468,12 +1569,17 @@ class ProfileLoader {
     }
 
     add3DEffect(element, intensity = 1) {
+        // Skip on mobile devices
+        if (this.isMobile) return;
+        
         // Prevent multiple event listeners
         if (element.has3DEffect) return;
         element.has3DEffect = true;
         
         let isHovering = false;
         let animationFrame = null;
+        let lastX = 0, lastY = 0;
+        let throttleTimeout = null;
         
         // Check if element has pseudo-elements that might conflict
         const hasPseudoElements = element.classList.contains('social-link') || 
@@ -1497,14 +1603,22 @@ class ProfileLoader {
             const rect = element.getBoundingClientRect();
             if (rect.width === 0 || rect.height === 0) return;
             
+            // Throttle for mobile performance
+            const deltaX = Math.abs(e.clientX - lastX);
+            const deltaY = Math.abs(e.clientY - lastY);
+            if (deltaX < 2 && deltaY < 2) return; // Skip small movements
+            
+            lastX = e.clientX;
+            lastY = e.clientY;
+            
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
             const mouseX = e.clientX;
             const mouseY = e.clientY;
             
-            // Use full intensity now that pseudo-elements are disabled
-            const maxRotation = 18;
-            const maxTranslation = 6;
+            // MOBILE OPTIMIZATION: Reduced intensity for performance
+            const maxRotation = this.isLowEndDevice ? 12 : 18;
+            const maxTranslation = this.isLowEndDevice ? 4 : 6;
             
             const rotateX = Math.max(-maxRotation, Math.min(maxRotation, 
                 (mouseY - centerY) / rect.height * -12 * intensity));
@@ -1520,8 +1634,10 @@ class ProfileLoader {
                 cancelAnimationFrame(animationFrame);
             }
             
+            // Throttle frame updates on low-end devices
+            if (this.isLowEndDevice && throttleTimeout) return;
+            
             animationFrame = requestAnimationFrame(() => {
-                // Now we can use full 3D transforms for all elements
                 element.style.transform = `
                     perspective(1000px) 
                     rotateX(${rotateX.toFixed(2)}deg) 
@@ -1552,6 +1668,13 @@ class ProfileLoader {
                 } else {
                     // Everything else gets a subtle neutral glow
                     element.style.boxShadow += `, 0 0 15px rgba(255, 255, 255, 0.1)`;
+                }
+                
+                // Throttle on low-end devices
+                if (this.isLowEndDevice) {
+                    throttleTimeout = setTimeout(() => {
+                        throttleTimeout = null;
+                    }, 16); // ~60fps
                 }
             });
         };
@@ -1655,7 +1778,8 @@ class ProfileLoader {
     }
 
     setupCursorEffect() {
-        if ('ontouchstart' in window) return; // Skip on touch devices
+        // Skip completely on mobile devices
+        if (this.isMobile || 'ontouchstart' in window) return;
         
         const cursor = document.createElement('div');
         cursor.className = 'cursor';
@@ -1674,60 +1798,60 @@ class ProfileLoader {
         `;
         document.body.appendChild(cursor);
         
-        // Mouse blob that follows cursor
-        const mouseBlob = document.getElementById('mouse-blob');
+        // OPTIMIZED: Use mouse blob only on non-low-end devices
+        const mouseBlob = !this.isLowEndDevice ? document.getElementById('mouse-blob') : null;
         
         let cursorX = 0, cursorY = 0;
         let blobX = 0, blobY = 0;
+        let lastUpdateTime = 0;
         
-        document.addEventListener('mousemove', (e) => {
+        const updateCursor = (e) => {
+            const now = performance.now();
+            // Throttle updates for performance
+            if (now - lastUpdateTime < 16) return; // ~60fps max
+            lastUpdateTime = now;
+            
             cursorX = e.clientX;
             cursorY = e.clientY;
             cursor.style.left = cursorX + 'px';
             cursor.style.top = cursorY + 'px';
             
-            // Smooth blob following with lag
-            blobX += (cursorX - blobX) * 0.05;
-            blobY += (cursorY - blobY) * 0.05;
-            
-            if (mouseBlob) {
+            // Only update blob on high-end devices
+            if (mouseBlob && !this.isLowEndDevice) {
+                blobX += (cursorX - blobX) * 0.05;
+                blobY += (cursorY - blobY) * 0.05;
                 mouseBlob.style.left = (blobX - 100) + 'px';
                 mouseBlob.style.top = (blobY - 100) + 'px';
             }
-        });
+        };
+        
+        document.addEventListener('mousemove', updateCursor, { passive: true });
 
-        // Enhanced cursor interactions - but avoid conflicts with 3D effects
+        // Simplified cursor interactions
         const interactiveElements = document.querySelectorAll(
             'a:not(.project-link):not(.social-link), button:not(.cta-button)'
         );
         
         interactiveElements.forEach(el => {
-            // Only apply cursor effects to elements without 3D effects
             if (!el.has3DEffect) {
                 el.addEventListener('mouseenter', () => {
                     cursor.style.transform = 'translate(-50%, -50%) scale(1.3)';
                     cursor.style.opacity = '0.5';
-                    if (mouseBlob) {
-                        mouseBlob.style.transform = 'scale(1.2)';
-                        mouseBlob.style.opacity = '0.25';
-                    }
-                });
+                }, { passive: true });
                 
                 el.addEventListener('mouseleave', () => {
                     cursor.style.transform = 'translate(-50%, -50%) scale(1)';
                     cursor.style.opacity = '0.3';
-                    if (mouseBlob) {
-                        mouseBlob.style.transform = 'scale(1)';
-                        mouseBlob.style.opacity = '0.15';
-                    }
-                });
+                }, { passive: true });
             }
         });
         
-        // Add particle effects on click
-        document.addEventListener('click', (e) => {
-            this.createClickParticles(e.clientX, e.clientY);
-        });
+        // Simplified click particles (only on high-end devices)
+        if (!this.isLowEndDevice) {
+            document.addEventListener('click', (e) => {
+                this.createClickParticles(e.clientX, e.clientY);
+            }, { passive: true });
+        }
     }
 
     createClickParticles(x, y) {
