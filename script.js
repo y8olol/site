@@ -1442,7 +1442,7 @@ class ProfileLoader {
             item.addEventListener('click', () => {
                 const tech = item.dataset.tech;
                 this.showTechInfo(tech);
-                this.addTechGlow(item);
+                // REMOVED: this.addTechGlow(item); - No more glow effect on click
             });
         });
 
@@ -1825,8 +1825,8 @@ class ProfileLoader {
             }
         });
         
-        // Simplified click particles (only on high-end devices)
-        if (!this.isLowEndDevice) {
+        // Simplified click particles - DISABLED to remove glow effects
+        if (false) { // Completely disabled
             document.addEventListener('click', (e) => {
                 this.createClickParticles(e.clientX, e.clientY);
             }, { passive: true });
