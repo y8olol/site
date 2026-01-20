@@ -487,7 +487,14 @@ class ProfileLoader {
                 : (repo.primaryLanguage ? `<span class="project-language ${repo.primaryLanguage.toLowerCase()}" data-lang="${repo.primaryLanguage.toLowerCase()}">${repo.primaryLanguage}</span>` : '');
             
             // Use description if available, otherwise generate one based on languages
-            const description = repo.description || this.generateDescriptionFromLanguages(repo.languages, repo.primaryLanguage);
+            let description = repo.description;
+            if (!description || description.trim().length === 0) {
+                description = this.generateDescriptionFromLanguages(repo.languages, repo.primaryLanguage);
+            }
+            // Ensure minimum description length
+            if (!description || description.trim().length < 10) {
+                description = `${this.formatRepoName(repo.name)} - A ${repo.primaryLanguage || 'software'} project with practical functionality.`;
+            }
             
             // Add repository stats
             const stats = [];
@@ -592,33 +599,39 @@ class ProfileLoader {
     }
 
     generateDescriptionFromLanguages(languages, primaryLanguage) {
+        // Always ensure we have a primary language
+        const mainLang = primaryLanguage || 'Software';
+        
         if (!languages || Object.keys(languages).length === 0) {
-            return `${primaryLanguage || 'Software'} project with practical functionality.`;
+            return `${mainLang} project with practical functionality and modern features.`;
         }
         
         const langNames = Object.keys(languages);
         const descriptions = {
-            'JavaScript': 'Modern web application',
-            'Python': 'Automation and processing tool',
-            'C#': 'Desktop application',
-            'Java': 'Cross-platform app',
-            'TypeScript': 'Type-safe web application',
-            'HTML': 'Web interface',
-            'CSS': 'Styled interface',
-            'Go': 'High-performance service',
-            'Rust': 'Systems programming',
-            'PHP': 'Web backend',
-            'Ruby': 'Web application',
-            'Swift': 'iOS/macOS app',
-            'Kotlin': 'Android application'
+            'JavaScript': 'Modern web application with interactive features',
+            'Python': 'Automation and processing tool with advanced capabilities',
+            'C#': 'Desktop application with modern user interface',
+            'Java': 'Cross-platform application with robust functionality',
+            'TypeScript': 'Type-safe web application with enhanced reliability',
+            'HTML': 'Web interface with responsive design',
+            'CSS': 'Styled web interface with modern aesthetics',
+            'Go': 'High-performance service with efficient processing',
+            'Rust': 'Systems programming with memory safety',
+            'PHP': 'Web backend with database integration',
+            'Ruby': 'Web application with elegant framework',
+            'Swift': 'iOS/macOS app with native performance',
+            'Kotlin': 'Android application with modern features'
         };
         
         if (langNames.length === 1) {
-            return descriptions[primaryLanguage] || `${primaryLanguage} application`;
+            return descriptions[mainLang] || `${mainLang} application with practical features`;
         } else {
-            const primaryDesc = descriptions[primaryLanguage] || `${primaryLanguage} app`;
-            const otherLangs = langNames.filter(lang => lang !== primaryLanguage).slice(0, 1);
-            return `${primaryDesc} with ${otherLangs[0]} integration`;
+            const primaryDesc = descriptions[mainLang] || `${mainLang} application`;
+            const otherLangs = langNames.filter(lang => lang !== mainLang).slice(0, 1);
+            if (otherLangs.length > 0) {
+                return `${primaryDesc} with ${otherLangs[0]} integration`;
+            }
+            return primaryDesc;
         }
     }
     
@@ -637,9 +650,11 @@ class ProfileLoader {
     }
     
     addLanguageHoverEffects() {
-        // Add hover effects for language tags
+        // Add hover effects for language tags - FIXED to prevent flicker
         document.querySelectorAll('.project-language').forEach(tag => {
-            const language = tag.dataset.language;
+            const langDataAttr = tag.dataset.lang;
+            if (!langDataAttr) return;
+            
             const languageColors = {
                 'javascript': '#f7df1e',
                 'python': '#3776ab',
@@ -658,17 +673,24 @@ class ProfileLoader {
                 'c': '#a8b9cc'
             };
             
-            if (languageColors[language]) {
-                tag.style.setProperty('--lang-color', languageColors[language]);
+            const colorKey = langDataAttr.toLowerCase();
+            const langColor = languageColors[colorKey];
+            
+            if (langColor) {
+                // Apply persistent styling - no more flickering
+                tag.style.color = langColor + ' !important';
+                tag.style.borderColor = langColor + ' !important';
+                tag.style.setProperty('--lang-color', langColor);
+                
+                // Keep original hover effects but without conflicting with persistent colors
                 tag.addEventListener('mouseenter', () => {
-                    tag.style.backgroundColor = languageColors[language] + '20';
-                    tag.style.borderColor = languageColors[language];
-                    tag.style.color = languageColors[language];
+                    tag.style.backgroundColor = langColor + '20';
+                    tag.style.transform = 'scale(1.05)';
                 });
                 tag.addEventListener('mouseleave', () => {
                     tag.style.backgroundColor = '';
-                    tag.style.borderColor = '';
-                    tag.style.color = '';
+                    tag.style.transform = 'scale(1)';
+                    // Don't reset color and border as they're persistent
                 });
             }
         });
@@ -1320,9 +1342,10 @@ class ProfileLoader {
     }
 
     addInteractivity() {
-        // Enhanced tech stack interactions with 3D effects
+        // Enhanced tech stack interactions WITHOUT 3D effects to prevent flickering
         document.querySelectorAll('.tech-item').forEach(item => {
-            this.add3DEffect(item, 1.0);
+            // REMOVED 3D effect to prevent icon flickering
+            // this.add3DEffect(item, 1.0);
             item.addEventListener('click', () => {
                 const tech = item.dataset.tech;
                 this.showTechInfo(tech);
@@ -1370,10 +1393,10 @@ class ProfileLoader {
             this.add3DEffect(profileImage, 0.7);
         }
 
-        // Tech icons inside cards - Re-enabled for 3D effects
-        document.querySelectorAll('.tech-icon').forEach(icon => {
-            this.add3DEffect(icon, 0.7);
-        });
+        // Tech icons inside cards - REMOVED to prevent flickering
+        // document.querySelectorAll('.tech-icon').forEach(icon => {
+        //     this.add3DEffect(icon, 0.7);
+        // });
 
         // Project links - Re-enabled for 3D effects
         document.querySelectorAll('.project-link').forEach(link => {
@@ -1518,20 +1541,7 @@ class ProfileLoader {
                 `;
                 
                 // Smart glow assignment based on element type
-                if (element.classList.contains('tech-item')) {
-                    // Tech cards get language-specific glow
-                    const langGlow = this.getLanguageGlow(element);
-                    element.style.boxShadow += `, 0 0 15px ${langGlow}`;
-                } else if (element.classList.contains('tech-icon')) {
-                    // Tech icons get their parent's language glow
-                    const parentCard = element.closest('.tech-item');
-                    if (parentCard) {
-                        const langGlow = this.getLanguageGlow(parentCard);
-                        element.style.boxShadow += `, 0 0 15px ${langGlow}`;
-                    } else {
-                        element.style.boxShadow += `, 0 0 15px rgba(255, 255, 255, 0.1)`;
-                    }
-                } else if (element.classList.contains('social-link')) {
+                if (element.classList.contains('social-link')) {
                     // Social links get a consistent cyan glow (not profile colors)
                     element.style.boxShadow += `, 0 0 15px rgba(0, 212, 255, 0.3)`;
                 } else if (element.classList.contains('project-language') || 
@@ -1564,12 +1574,20 @@ class ProfileLoader {
             element.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease-out';
             element.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateX(0px) translateY(0px) translateZ(0px) scale(1)';
             
-            // CRITICAL FIX: Don't reset box-shadow immediately, let CSS hover take over
+            // CRITICAL FIX: For elements that might have conflicts, preserve styling without flicker
+            if (element.classList.contains('project-language') || 
+                element.classList.contains('status-indicator') ||
+                element.classList.contains('profile-image')) {
+                // Don't clear box-shadow for these elements - let CSS maintain the styling
+                return;
+            }
+            
+            // For other elements, clear box-shadow after transition
             setTimeout(() => {
-                if (!isHovering) { // Only clear if still not hovering
+                if (!isHovering) {
                     element.style.boxShadow = '';
                 }
-            }, 100); // Small delay to prevent flickering
+            }, 300); // Wait for full transition
         });
     }
 
