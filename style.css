@@ -121,7 +121,7 @@ body {
     }
 }
 
-/* Additional floating blobs - WAY MORE! - TRULY RANDOM MOVEMENT */
+/* CONSISTENT EXPERIENCE: No mobile optimizations */
 .lava-blob {
     position: fixed;
     border-radius: 50%;
@@ -129,54 +129,19 @@ body {
     z-index: 0;
     filter: blur(25px);
     opacity: 0.25;
-    /* MOBILE OPTIMIZATION: Keep running but optimized */
     animation-play-state: running;
-    /* Add randomization */
     animation-fill-mode: both;
     animation-timing-function: ease-in-out;
 }
 
-/* MOBILE OPTIMIZATION: Keep lava lamp but optimize it */
+/* CONSISTENT EXPERIENCE: Remove mobile optimization overrides */
 @media (max-width: 768px), (max-height: 600px) {
-    .lava-blob {
-        /* Keep lava lamp on mobile but with reduced effects */
-        filter: blur(20px) !important;
-        opacity: 0.15 !important;
-    }
-    
-    .grain-overlay {
-        display: none; /* Disable grain texture on mobile */
-    }
-    
-    .bg-grid {
-        animation-play-state: paused;
-    }
-    
-    .mouse-blob {
-        display: none; /* No mouse blob on mobile */
-    }
+    /* Keep same experience - no optimization overrides */
 }
 
-/* LOW-END DEVICE OPTIMIZATIONS */
+/* CONSISTENT EXPERIENCE: Remove low-end device overrides */
 @media (max-width: 480px) {
-    .lava-blob {
-        /* Keep lava lamp but extremely simplified */
-        filter: blur(15px) !important;
-        opacity: 0.1 !important;
-        animation-duration: 8s !important; /* Slower for performance */
-    }
-    
-    .grain-overlay,
-    .bg-grid,
-    .mouse-blob {
-        display: none !important;
-    }
-    
-    /* Reduce transform operations */
-    * {
-        transform-style: flat !important;
-        backface-visibility: visible !important;
-    }
+    /* Keep same experience - no overrides */
 }
 
 /* Blob 1 - Large Blue - DISABLED - Now using dynamic animations */
@@ -575,6 +540,7 @@ body {
     transition: all 0.3s ease;
     z-index: -1;
     border-radius: inherit;
+    pointer-events: none; /* Prevent interaction */
 }
 
 .social-link:hover::before {
@@ -1302,7 +1268,7 @@ section {
     -ms-user-select: none;
     user-select: none;
 }
-/* ===== MOBILE & TOUCH OPTIMIZATIONS ===== */
+/* ===== CONSISTENT EXPERIENCE - NO MOBILE OPTIMIZATIONS ===== */
 @media (max-width: 1200px) {
     .tech-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -1313,179 +1279,36 @@ section {
     }
 }
 
-/* TABLET OPTIMIZATIONS */
+/* Keep layouts consistent - minimal responsive changes */
 @media (max-width: 768px) {
     .main-dashboard {
-        gap: 0.5rem;
-        padding: 0.5rem;
-        height: auto; /* Allow natural height on mobile */
-        min-height: 100vh;
-    }
-    
-    .hero-section {
-        height: auto;
-        min-height: 25vh;
-        padding: 1rem 0;
+        gap: 1rem;
+        padding: 1rem;
     }
     
     .profile-card {
         grid-template-columns: 1fr;
         text-align: center;
-        gap: 2rem; /* Increased spacing */
+        gap: 2rem;
         padding: 1.5rem;
-        /* Remove backdrop blur on mobile for performance */
-        backdrop-filter: none;
-        background: rgba(0, 0, 0, 0.8);
     }
     
-    /* Improve spacing between profile elements on mobile */
     .profile-info {
-        margin-top: 1rem; /* Add space above name/description */
+        margin-top: 1rem;
     }
     
     .status-indicator {
-        margin-top: 1.5rem; /* Push status indicator down */
-    }
-    
-    .tech-stack-section,
-    .projects-section {
-        height: auto;
-        min-height: 30vh;
-        padding: 1.5rem;
-        /* Reduce backdrop blur */
-        backdrop-filter: blur(5px);
-    }
-    
-    .tech-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
-    }
-    
-    .projects-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-        /* Improve touch scrolling */
-        -webkit-overflow-scrolling: touch;
-        scroll-behavior: smooth;
-    }
-    
-    .section-title {
-        font-size: 1.5rem;
-    }
-    
-    .tech-stack-section .section-title,
-    .projects-section .section-title {
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-    }
-    
-    /* TOUCH OPTIMIZATION: Larger tap targets */
-    .tech-item,
-    .social-link,
-    .project-link {
-        min-height: 44px; /* iOS recommended minimum */
-        touch-action: manipulation; /* Disable double-tap zoom */
-    }
-    
-    /* Faster transitions on mobile */
-    * {
-        transition-duration: 0.2s !important;
+        margin-top: 1.5rem;
     }
 }
 
-/* MOBILE PHONE OPTIMIZATIONS */
+/* Minimal phone adjustments */
 @media (max-width: 480px) {
     .profile-card {
         padding: 1rem;
-        margin: 0.5rem;
-    }
-    
-    .tech-stack-section,
-    .projects-section {
-        padding: 1rem;
-        margin: 0.5rem;
-    }
-    
-    .tech-grid {
-        grid-template-columns: 1fr;
-        gap: 0.5rem;
-    }
-    
-    .tech-item {
-        min-height: 50px;
-        padding: 0.75rem;
-    }
-    
-    .project-card {
-        min-height: auto;
-        padding: 1rem;
-    }
-    
-    /* Simplify text for small screens */
-    .profile-image {
-        width: 60px;
-        height: 60px;
-    }
-    
-    .name-main {
-        font-size: 1.5rem;
-    }
-    
-    .tagline {
-        font-size: 0.8rem;
-        line-height: 1.4;
     }
     
     .social-link {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.8rem;
-        min-height: 44px;
-    }
-    
-    /* Remove expensive visual effects */
-    * {
-        box-shadow: none !important;
-        text-shadow: none !important;
-        filter: none !important;
-        backdrop-filter: none !important;
-    }
-    
-    /* Simplify backgrounds */
-    .tech-stack-section,
-    .projects-section,
-    .profile-card {
-        background: rgba(0, 0, 0, 0.9) !important;
-        border: 1px solid #333 !important;
-    }
-}
-
-/* LANDSCAPE MOBILE OPTIMIZATION */
-@media (max-height: 500px) and (orientation: landscape) {
-    .main-dashboard {
-        height: auto;
-        min-height: 100vh;
-    }
-    
-    .hero-section {
-        height: auto;
-        min-height: auto;
-        padding: 0.5rem 0;
-    }
-    
-    .profile-card {
-        grid-template-columns: auto 1fr auto;
-        text-align: left;
-    }
-    
-    .tech-stack-section {
-        height: auto;
-        min-height: auto;
-    }
-}
-
-/* HIGH DPI SCREEN OPTIMIZATIONS */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    .mobile-optimized .grain-overlay {
-        display: none; /* Remove grain on high-DPI mobile screens */
+        min-height: 44px; /* Touch target */
     }
 }

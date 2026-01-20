@@ -26,9 +26,6 @@ class ProfileLoader {
     }
 
     async init() {
-        // MOBILE OPTIMIZATION: Apply performance optimizations first
-        this.applyMobileOptimizations();
-        
         await this.loadGitHubProfile();
         await this.loadGitHubRepos();
         this.setupDiscordStatus();
@@ -36,98 +33,6 @@ class ProfileLoader {
         this.addInteractivity();
     }
 
-    applyMobileOptimizations() {
-        if (this.isMobile || this.isLowEndDevice) {
-            console.log('📱 Applying mobile/low-end device optimizations...');
-            
-            // Add performance CSS class
-            document.body.classList.add('mobile-optimized');
-            
-            if (this.isLowEndDevice) {
-                document.body.classList.add('low-end-device');
-            }
-            
-            // Disable heavy animations
-            this.disableHeavyAnimations();
-            
-            // Reduce animation frame rate for remaining animations
-            this.setupReducedFrameRate();
-            
-            // Disable unused event listeners
-            this.optimizeEventListeners();
-        }
-    }
-
-    disableHeavyAnimations() {
-        // Remove or pause heavy CSS animations
-        const heavyElements = document.querySelectorAll('.lava-blob, .grain-overlay, .mouse-blob');
-        heavyElements.forEach(el => {
-            el.style.display = 'none';
-        });
-        
-        // Pause background grid animation
-        const bgGrid = document.querySelector('.bg-grid');
-        if (bgGrid) {
-            bgGrid.style.animationPlayState = 'paused';
-            if (this.isLowEndDevice) {
-                bgGrid.style.display = 'none';
-            }
-        }
-        
-        // Simplify transitions
-        const style = document.createElement('style');
-        style.textContent = `
-            .mobile-optimized * {
-                transition-duration: 0.2s !important;
-                animation-duration: 0.5s !important;
-            }
-            
-            .low-end-device * {
-                transition: none !important;
-                transform: none !important;
-                filter: none !important;
-                backdrop-filter: none !important;
-                mix-blend-mode: normal !important;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    setupReducedFrameRate() {
-        // Throttle requestAnimationFrame on low-end devices
-        if (this.isLowEndDevice) {
-            const originalRAF = window.requestAnimationFrame;
-            let lastFrameTime = 0;
-            
-            window.requestAnimationFrame = (callback) => {
-                const now = performance.now();
-                if (now - lastFrameTime >= 33) { // ~30fps instead of 60fps
-                    lastFrameTime = now;
-                    return originalRAF(callback);
-                }
-                return setTimeout(() => callback(now), 16);
-            };
-        }
-    }
-
-    optimizeEventListeners() {
-        // Use passive listeners where possible
-        const originalAddEventListener = Element.prototype.addEventListener;
-        
-        Element.prototype.addEventListener = function(type, listener, options) {
-            // Make scroll and touch events passive by default
-            if (type === 'scroll' || type === 'touchstart' || type === 'touchmove' || type === 'wheel') {
-                if (typeof options === 'boolean') {
-                    options = { capture: options, passive: true };
-                } else if (!options) {
-                    options = { passive: true };
-                } else {
-                    options.passive = true;
-                }
-            }
-            return originalAddEventListener.call(this, type, listener, options);
-        };
-    }
 
     async loadGitHubProfile() {
         try {
@@ -874,48 +779,41 @@ class ProfileLoader {
     }
     
     setupRandomizedLavaLamp() {
-        console.log('🌈 Setting up performance-optimized lava lamp...');
+        console.log('🌈 Setting up consistent lava lamp for all devices...');
         
         const blobs = document.querySelectorAll('.lava-blob');
         
-        // MAJOR PERFORMANCE OPTIMIZATION: Reduce blob count based on device capability
-        let activeBlobs;
-        if (this.isLowEndDevice) {
-            activeBlobs = 3; // Only 3 blobs on low-end
-            console.log('📱 Low-end device: using only 3 blobs');
-        } else if (this.isMobile) {
-            activeBlobs = 6; // 6 blobs on mobile
-            console.log('📱 Mobile device: using 6 blobs');
-        } else {
-            activeBlobs = 10; // 10 blobs on desktop
-            console.log('💻 Desktop: using 10 blobs');
-        }
+        // CONSISTENT EXPERIENCE: Same number of blobs for all devices
+        const activeBlobs = 12; // 12 blobs for everyone
+        console.log(`🎆 Using ${activeBlobs} blobs for consistent experience`);
         
-        // Hide excess blobs for performance
+        // Hide excess blobs
         blobs.forEach((blob, index) => {
             if (index >= activeBlobs) {
                 blob.style.display = 'none';
                 return;
             }
             
-            // Simple size variations - no random calculations
-            const sizes = [120, 160, 200, 140, 180, 150, 170, 130, 190, 160];
+            // Consistent size variations
+            const sizes = [140, 180, 220, 160, 200, 170, 190, 150, 210, 180, 160, 200];
             const size = sizes[index % sizes.length];
             blob.style.width = `${size}px`;
             blob.style.height = `${size}px`;
             
-            // Pre-calculated grid positions (no random calculations per blob)
+            // Pre-calculated grid positions ensuring good coverage
             const positions = [
-                { x: 10, y: 10 },   // top-left
-                { x: 80, y: 15 },   // top-right  
-                { x: 15, y: 75 },   // bottom-left
-                { x: 75, y: 80 },   // bottom-right
-                { x: 45, y: 20 },   // top-center
-                { x: 20, y: 45 },   // left-center
+                { x: 8, y: 8 },     // top-left (guaranteed)
+                { x: 85, y: 12 },   // top-right  
+                { x: 12, y: 78 },   // bottom-left
+                { x: 78, y: 85 },   // bottom-right
+                { x: 45, y: 15 },   // top-center
+                { x: 18, y: 45 },   // left-center
                 { x: 75, y: 50 },   // right-center
                 { x: 50, y: 75 },   // bottom-center
-                { x: 60, y: 40 },   // center-right
-                { x: 35, y: 55 }    // center-left
+                { x: 65, y: 35 },   // center-right
+                { x: 32, y: 60 },   // center-left
+                { x: 25, y: 25 },   // top-left-inner
+                { x: 60, y: 15 }    // top-right-inner
             ];
             
             const pos = positions[index % positions.length];
@@ -930,10 +828,10 @@ class ProfileLoader {
             ];
             blob.style.background = colors[index % colors.length];
             
-            // Use PREDEFINED CSS animations instead of generating them
+            // Use predefined CSS animations
             const animations = ['smoothFloat1', 'smoothFloat2', 'smoothFloat3', 'smoothFloat4', 'smoothFloat5'];
-            const durations = [8, 10, 12, 9, 11, 7, 13, 8.5, 9.5, 10.5];
-            const delays = [0, 2, 4, 1, 3, 1.5, 2.5, 3.5, 0.5, 1.8];
+            const durations = [9, 11, 13, 10, 12, 8, 14, 9.5, 10.5, 11.5, 8.5, 12.5];
+            const delays = [0, 2, 4, 1, 3, 1.5, 2.5, 3.5, 0.5, 1.8, 2.8, 3.2];
             
             blob.style.animationName = animations[index % animations.length];
             blob.style.animationDuration = `${durations[index % durations.length]}s`;
@@ -945,7 +843,7 @@ class ProfileLoader {
             console.log(`🎯 Blob ${index + 1}: pos=(${pos.x}%, ${pos.y}%), size=${size}px, anim=${animations[index % animations.length]}`);
         });
         
-        console.log(`✨ Optimized lava lamp with ${activeBlobs} blobs for performance!`);
+        console.log(`✨ Consistent lava lamp ready with ${activeBlobs} blobs!`);
     }
 
 
