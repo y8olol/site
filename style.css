@@ -461,7 +461,7 @@ body {
 .name {
     display: flex;
     flex-direction: column;
-    gap: 0.1rem;
+    gap: 1.2rem; /* Increased from 0.1rem for more spacing */
 }
 
 .name-main {

@@ -10,19 +10,21 @@ class ProfileLoader {
     }
 
     detectMobile() {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent) || 
-               'ontouchstart' in window || 
-               window.innerWidth <= 768;
+        // FORCE DISABLE: Always return false to enable 3D effects
+        // return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent) || 
+        //        'ontouchstart' in window || 
+        //        window.innerWidth <= 768;
+        return false; // Force desktop mode
     }
 
     detectLowEndDevice() {
-        // Detect low-end devices for performance optimization
-        const hardwareConcurrency = navigator.hardwareConcurrency || 2;
-        const deviceMemory = navigator.deviceMemory || 2;
-        const isLowEnd = hardwareConcurrency <= 2 || deviceMemory <= 2;
+        // FORCE DISABLE: Always return false to enable 3D effects
+        // const hardwareConcurrency = navigator.hardwareConcurrency || 2;
+        // const deviceMemory = navigator.deviceMemory || 2;
+        // const isLowEnd = hardwareConcurrency <= 2 || deviceMemory <= 2;
         
-        console.log(`📱 Device Info: Cores: ${hardwareConcurrency}, RAM: ${deviceMemory}GB, Low-end: ${isLowEnd}`);
-        return isLowEnd;
+        console.log(`🚀 Device detection DISABLED - forcing high-performance mode`);
+        return false; // Force high-performance mode
     }
 
     async init() {

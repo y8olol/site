@@ -1,0 +1,269 @@
+/* ENHANCED MOBILE LAYOUT - Same Effects, Better Vertical Stacking */
+
+/* Keep same 3D effects on all devices, but optimize layout for mobile */
+
+/* Mobile: Improved vertical layout while keeping 3D effects */
+@media (max-width: 768px) {
+    /* Main dashboard adjustments for mobile */
+    .main-dashboard {
+        height: auto; /* Allow content to flow naturally */
+        min-height: 100vh; /* Ensure full height coverage */
+        gap: 1.5rem;
+        padding: 1rem;
+    }
+    
+    /* Hero section - better mobile spacing */
+    .hero-section {
+        height: auto; /* Let it size based on content */
+        min-height: 25vh;
+        padding: 1rem 0;
+    }
+    
+    /* Profile card - vertical stacking */
+    .profile-card {
+        grid-template-columns: 1fr; /* Single column layout */
+        grid-template-rows: auto auto auto; /* Three rows */
+        gap: 2rem;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        max-width: none; /* Use full width */
+    }
+    
+    /* Profile image container - centered */
+    .profile-image-container {
+        order: 1; /* First element */
+        justify-self: center;
+    }
+    
+    /* Profile info - larger text for mobile */
+    .profile-info {
+        order: 2; /* Second element */
+        margin-top: 0;
+        gap: 1rem;
+    }
+    
+    /* Name section - better mobile typography */
+    .name-main {
+        font-size: 2.2rem; /* Slightly larger on mobile */
+        text-align: center;
+    }
+    
+    .tagline {
+        font-size: 0.9rem; /* Slightly larger for readability */
+        text-align: center;
+        max-width: 90%;
+        margin: 0 auto;
+    }
+    
+    /* Social links - third element */
+    .social-links {
+        order: 3;
+        align-items: center; /* Center the links */
+        gap: 1rem;
+        width: 100%;
+        max-width: 300px;
+        justify-self: center;
+    }
+    
+    /* Tech stack section - vertical grid on mobile */
+    .tech-stack-section {
+        height: auto; /* Let content determine height */
+        min-height: 20vh;
+        padding: 1.5rem;
+    }
+    
+    .tech-stack-section .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .tech-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
+        gap: 1rem;
+        padding: 0.5rem 0;
+    }
+    
+    .tech-item {
+        min-height: 100px; /* Larger touch targets */
+        padding: 1rem 0.5rem;
+    }
+    
+    .tech-item span {
+        font-size: 0.8rem; /* Slightly larger text */
+    }
+    
+    /* Projects section - vertical scrolling on mobile */
+    .projects-section {
+        height: auto; /* Let content flow */
+        min-height: 50vh;
+        padding: 1.5rem;
+    }
+    
+    .projects-section .section-title {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .projects-grid {
+        display: flex;
+        flex-direction: column; /* Stack vertically on mobile */
+        gap: 1.5rem;
+        overflow-x: visible; /* No horizontal scroll */
+        overflow-y: visible;
+        padding-bottom: 0;
+    }
+    
+    .project-card {
+        min-width: 100%; /* Full width on mobile */
+        max-width: 100%;
+        width: 100%;
+        margin: 0 auto;
+        padding: 1.5rem;
+    }
+    
+    .project-header {
+        margin-bottom: 1rem;
+    }
+    
+    .project-title {
+        font-size: 1rem; /* Larger title on mobile */
+    }
+    
+    .project-description {
+        font-size: 0.85rem; /* More readable text */
+        line-height: 1.4;
+        -webkit-line-clamp: 4; /* Allow more lines on mobile */
+        max-height: 4.5rem;
+    }
+    
+    .project-languages {
+        gap: 0.5rem;
+        margin: 1rem 0;
+    }
+    
+    .project-language {
+        font-size: 0.75rem; /* Larger language tags */
+        padding: 0.25rem 0.75rem;
+    }
+    
+    /* Enhanced touch targets for mobile */
+    .social-link {
+        min-height: 50px; /* Better touch target */
+        padding: 1rem 1.25rem;
+        font-size: 0.9rem;
+        justify-content: center;
+    }
+    
+    .project-button {
+        min-height: 40px; /* Better touch targets */
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* Small mobile devices - extra optimization */
+@media (max-width: 480px) {
+    .main-dashboard {
+        padding: 0.75rem;
+        gap: 1.25rem;
+    }
+    
+    .profile-card {
+        padding: 1.5rem 1rem;
+        gap: 1.5rem;
+        border-radius: 12px;
+    }
+    
+    .name-main {
+        font-size: 2rem;
+    }
+    
+    .tagline {
+        font-size: 0.85rem;
+    }
+    
+    .tech-grid {
+        grid-template-columns: 1fr; /* Single column on very small screens */
+        gap: 0.75rem;
+    }
+    
+    .tech-item {
+        min-height: 80px;
+        padding: 0.75rem;
+    }
+    
+    .social-links {
+        gap: 0.75rem;
+        max-width: 280px;
+    }
+    
+    .social-link {
+        min-height: 48px;
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .projects-section,
+    .tech-stack-section {
+        padding: 1rem;
+        border-radius: 12px;
+    }
+    
+    .project-card {
+        padding: 1.25rem;
+    }
+}
+
+/* Large mobile/small tablet - optimize for landscape */
+@media (max-width: 768px) and (orientation: landscape) {
+    .main-dashboard {
+        gap: 1rem; /* Tighter spacing in landscape */
+    }
+    
+    .profile-card {
+        grid-template-columns: auto 1fr auto; /* Back to horizontal layout */
+        text-align: left;
+        padding: 1.5rem;
+        gap: 1.5rem;
+    }
+    
+    .profile-info {
+        text-align: left;
+    }
+    
+    .name-main,
+    .tagline {
+        text-align: left;
+    }
+    
+    .social-links {
+        align-items: flex-start;
+    }
+    
+    .tech-grid {
+        grid-template-columns: repeat(4, 1fr); /* More columns in landscape */
+    }
+}
+
+/* Keep 3D effects on mobile - just optimize performance */
+@media (max-width: 768px) {
+    /* Lighter 3D effects for mobile performance */
+    .project-card:hover,
+    .project-card:active {
+        transform: perspective(600px) rotateX(-3deg) rotateY(3deg) translateZ(8px) scale(1.02) !important;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25) !important;
+    }
+    
+    .tech-item:hover,
+    .tech-item:active {
+        transform: perspective(400px) rotateX(-2deg) rotateY(2deg) translateZ(6px) scale(1.03) !important;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    /* Ensure transitions are smooth on mobile */
+    .project-card,
+    .tech-item,
+    .social-link {
+        transition: transform 0.2s ease-out, box-shadow 0.2s ease-out !important;
+    }
+}
