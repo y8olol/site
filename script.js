@@ -32,6 +32,7 @@ class ProfileLoader {
         await this.loadGitHubProfile();
         await this.loadGitHubRepos();
         this.setupDiscordStatus();
+        this.setupRandomizedLavaLamp();
         this.addInteractivity();
     }
 
@@ -854,10 +855,12 @@ class ProfileLoader {
         const statusIndicator = document.getElementById('discord-status');
         const discordLink = document.getElementById('discord-link');
         
+        // Always start with default Available state
+        statusIndicator.querySelector('.status-text').textContent = 'Available';
+        statusIndicator.classList.add('online');
+        
         if (!this.discord_user_id) {
-            // No Discord ID provided - show default
-            statusIndicator.querySelector('.status-text').textContent = 'Available';
-            statusIndicator.classList.add('online');
+            // No Discord ID provided - keep default
             discordLink.href = '#';
             discordLink.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -869,15 +872,91 @@ class ProfileLoader {
         // Try to fetch real Discord status
         this.fetchDiscordStatus();
     }
+    
+    setupRandomizedLavaLamp() {
+        console.log('🌈 Setting up performance-optimized lava lamp...');
+        
+        const blobs = document.querySelectorAll('.lava-blob');
+        
+        // MAJOR PERFORMANCE OPTIMIZATION: Reduce blob count based on device capability
+        let activeBlobs;
+        if (this.isLowEndDevice) {
+            activeBlobs = 3; // Only 3 blobs on low-end
+            console.log('📱 Low-end device: using only 3 blobs');
+        } else if (this.isMobile) {
+            activeBlobs = 6; // 6 blobs on mobile
+            console.log('📱 Mobile device: using 6 blobs');
+        } else {
+            activeBlobs = 10; // 10 blobs on desktop
+            console.log('💻 Desktop: using 10 blobs');
+        }
+        
+        // Hide excess blobs for performance
+        blobs.forEach((blob, index) => {
+            if (index >= activeBlobs) {
+                blob.style.display = 'none';
+                return;
+            }
+            
+            // Simple size variations - no random calculations
+            const sizes = [120, 160, 200, 140, 180, 150, 170, 130, 190, 160];
+            const size = sizes[index % sizes.length];
+            blob.style.width = `${size}px`;
+            blob.style.height = `${size}px`;
+            
+            // Pre-calculated grid positions (no random calculations per blob)
+            const positions = [
+                { x: 10, y: 10 },   // top-left
+                { x: 80, y: 15 },   // top-right  
+                { x: 15, y: 75 },   // bottom-left
+                { x: 75, y: 80 },   // bottom-right
+                { x: 45, y: 20 },   // top-center
+                { x: 20, y: 45 },   // left-center
+                { x: 75, y: 50 },   // right-center
+                { x: 50, y: 75 },   // bottom-center
+                { x: 60, y: 40 },   // center-right
+                { x: 35, y: 55 }    // center-left
+            ];
+            
+            const pos = positions[index % positions.length];
+            blob.style.left = `${pos.x}%`;
+            blob.style.top = `${pos.y}%`;
+            
+            // Assign colors cyclically
+            const colors = [
+                'var(--accent-primary, #00d4ff)',
+                'var(--accent-secondary, #7c3aed)', 
+                'var(--accent-tertiary, #f59e0b)'
+            ];
+            blob.style.background = colors[index % colors.length];
+            
+            // Use PREDEFINED CSS animations instead of generating them
+            const animations = ['smoothFloat1', 'smoothFloat2', 'smoothFloat3', 'smoothFloat4', 'smoothFloat5'];
+            const durations = [8, 10, 12, 9, 11, 7, 13, 8.5, 9.5, 10.5];
+            const delays = [0, 2, 4, 1, 3, 1.5, 2.5, 3.5, 0.5, 1.8];
+            
+            blob.style.animationName = animations[index % animations.length];
+            blob.style.animationDuration = `${durations[index % durations.length]}s`;
+            blob.style.animationDelay = `${delays[index % delays.length]}s`;
+            blob.style.animationIterationCount = 'infinite';
+            blob.style.animationTimingFunction = 'ease-in-out';
+            blob.style.animationDirection = index % 2 === 0 ? 'normal' : 'alternate';
+            
+            console.log(`🎯 Blob ${index + 1}: pos=(${pos.x}%, ${pos.y}%), size=${size}px, anim=${animations[index % animations.length]}`);
+        });
+        
+        console.log(`✨ Optimized lava lamp with ${activeBlobs} blobs for performance!`);
+    }
+
 
     async fetchDiscordStatus() {
         console.log('💬 Fetching Discord status for user:', this.discord_user_id);
         const statusIndicator = document.getElementById('discord-status');
         const discordLink = document.getElementById('discord-link');
         
-        // Show loading state
-        statusIndicator.querySelector('.status-text').textContent = 'Checking...';
-        statusIndicator.classList.add('loading');
+        // Start with default state instead of loading
+        statusIndicator.querySelector('.status-text').textContent = 'Available';
+        statusIndicator.classList.add('online');
         
         try {
             console.log('🔄 Fetching REAL Discord status via Lanyard...');

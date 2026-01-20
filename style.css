@@ -121,7 +121,7 @@ body {
     }
 }
 
-/* Additional floating blobs - WAY MORE! - MOBILE OPTIMIZED */
+/* Additional floating blobs - WAY MORE! - TRULY RANDOM MOVEMENT */
 .lava-blob {
     position: fixed;
     border-radius: 50%;
@@ -129,15 +129,19 @@ body {
     z-index: 0;
     filter: blur(25px);
     opacity: 0.25;
-    /* MOBILE OPTIMIZATION: Disable on low-end devices */
+    /* MOBILE OPTIMIZATION: Keep running but optimized */
     animation-play-state: running;
+    /* Add randomization */
+    animation-fill-mode: both;
+    animation-timing-function: ease-in-out;
 }
 
-/* MOBILE PERFORMANCE: Disable heavy animations on small screens */
+/* MOBILE OPTIMIZATION: Keep lava lamp but optimize it */
 @media (max-width: 768px), (max-height: 600px) {
     .lava-blob {
-        animation-play-state: paused;
-        display: none; /* Hide completely on mobile for performance */
+        /* Keep lava lamp on mobile but with reduced effects */
+        filter: blur(20px) !important;
+        opacity: 0.15 !important;
     }
     
     .grain-overlay {
@@ -155,7 +159,13 @@ body {
 
 /* LOW-END DEVICE OPTIMIZATIONS */
 @media (max-width: 480px) {
-    .lava-blob,
+    .lava-blob {
+        /* Keep lava lamp but extremely simplified */
+        filter: blur(15px) !important;
+        opacity: 0.1 !important;
+        animation-duration: 8s !important; /* Slower for performance */
+    }
+    
     .grain-overlay,
     .bg-grid,
     .mouse-blob {
@@ -169,391 +179,86 @@ body {
     }
 }
 
-/* Blob 1 - Large Blue - DISABLED */
+/* Blob 1 - Large Blue - DISABLED - Now using dynamic animations */
 .lava-blob:nth-child(2) {
     display: none;
 }
 
-/* Blob 2 - Medium Purple */
-.lava-blob:nth-child(3) {
-    width: 250px;
-    height: 250px;
-    background: var(--accent-secondary, #7c3aed);
-    top: 70%;
-    right: 10%;
-    animation: blob2 8s ease-in-out infinite reverse;
-}
+/* All other blob styles removed - using dynamic JavaScript animations */
 
-/* Blob 3 - Large Dynamic Color */
-.lava-blob:nth-child(4) {
-    width: 220px;
-    height: 220px;
-    background: var(--accent-tertiary, var(--accent-primary));
-    bottom: 15%;
-    left: 60%;
-    animation: blob3 7s ease-in-out infinite;
-}
-
-/* Blob 4 - Small Fast Blue */
-.lava-blob:nth-child(5) {
-    width: 150px;
-    height: 150px;
-    background: var(--accent-primary, #00d4ff);
-    top: 45%;
-    left: 80%;
-    animation: blob4 5s ease-in-out infinite;
-}
-
-/* Blob 5 - Medium Fast Purple */
-.lava-blob:nth-child(6) {
-    width: 200px;
-    height: 200px;
-    background: var(--accent-secondary, #7c3aed);
-    top: 25%;
-    left: 40%;
-    animation: blob5 4s ease-in-out infinite reverse;
-}
-
-/* Blob 6 - Medium Slow Dynamic Color - REDUCED SIZE */
-.lava-blob:nth-child(7) {
-    width: 180px;
-    height: 180px;
-    background: var(--accent-tertiary, var(--accent-primary));
-    bottom: 60%;
-    right: 30%;
-    animation: blob6 9s ease-in-out infinite;
-}
-
-/* Blob 7 - Small Hyper Fast */
-.lava-blob:nth-child(8) {
-    width: 120px;
-    height: 120px;
-    background: var(--accent-primary, #00d4ff);
-    top: 80%;
-    left: 25%;
-    animation: blob7 3s ease-in-out infinite;
-}
-
-/* Blob 8 - Medium Chaotic */
-.lava-blob:nth-child(9) {
-    width: 180px;
-    height: 180px;
-    background: var(--accent-secondary, #7c3aed);
-    top: 5%;
-    right: 45%;
-    animation: blob8 5.5s ease-in-out infinite reverse;
-}
-
-/* Blob 9 - Tiny Speed Demon */
-.lava-blob:nth-child(10) {
-    width: 100px;
-    height: 100px;
-    background: var(--accent-tertiary, var(--accent-primary));
-    bottom: 40%;
-    left: 15%;
-    animation: blob9 2.5s ease-in-out infinite;
-}
-
-/* Blob 10 - The Wanderer */
-.lava-blob:nth-child(11) {
-    width: 220px;
-    height: 220px;
-    background: var(--accent-primary, #00d4ff);
-    top: 55%;
-    right: 60%;
-    animation: blob10 6.5s ease-in-out infinite;
-}
-
-/* EXTRA CHAOS BLOBS 11-17 - MAXIMUM EXCITEMENT! */
-.lava-blob:nth-child(12) {
-    width: 160px;
-    height: 160px;
-    background: var(--accent-secondary, #7c3aed);
-    top: 12%;
-    left: 75%;
-    animation: blob11 1.8s ease-in-out infinite;
-}
-
-.lava-blob:nth-child(13) {
-    width: 200px;
-    height: 200px;
-    background: var(--accent-tertiary, var(--accent-primary));
-    bottom: 35%;
-    right: 5%;
-    animation: blob12 2.2s ease-in-out infinite reverse;
-}
-
-.lava-blob:nth-child(14) {
-    width: 140px;
-    height: 140px;
-    background: var(--accent-primary, #00d4ff);
-    top: 68%;
-    left: 30%;
-    animation: blob13 1.4s ease-in-out infinite;
-}
-
-.lava-blob:nth-child(15) {
-    width: 200px;
-    height: 200px;
-    background: var(--accent-secondary, #7c3aed);
-    top: 85%;
-    right: 40%;
-    animation: blob14 3.1s ease-in-out infinite reverse;
-}
-
-.lava-blob:nth-child(16) {
-    width: 90px;
-    height: 90px;
-    background: var(--accent-tertiary, var(--accent-primary));
-    top: 35%;
-    left: 15%;
-    animation: blob15 1.0s ease-in-out infinite;
-}
-
-.lava-blob:nth-child(17) {
-    width: 240px;
-    height: 240px;
-    background: var(--accent-primary, #00d4ff);
-    bottom: 8%;
-    left: 80%;
-    animation: blob16 2.8s ease-in-out infinite;
-}
-
-.lava-blob:nth-child(18) {
-    width: 190px;
-    height: 190px;
-    background: var(--accent-secondary, #7c3aed);
-    top: 50%;
-    left: 85%;
-    animation: blob17 1.6s ease-in-out infinite reverse;
-}
-
-@keyframes blob1 {
+/* PERFORMANCE-OPTIMIZED SMOOTH BLOB ANIMATIONS */
+@keyframes smoothFloat1 {
     0%, 100% {
-        transform: translate(0px, 0px) scale(1) rotate(0deg);
+        transform: translate(0px, 0px) rotate(0deg) scale(1);
     }
     25% {
-        transform: translate(60px, -80px) scale(1.3) rotate(90deg);
+        transform: translate(40px, -30px) rotate(15deg) scale(1.1);
     }
     50% {
-        transform: translate(-40px, 60px) scale(0.7) rotate(180deg);
+        transform: translate(-20px, 40px) rotate(-10deg) scale(0.9);
     }
     75% {
-        transform: translate(80px, -20px) scale(1.1) rotate(270deg);
+        transform: translate(30px, 20px) rotate(20deg) scale(1.05);
     }
 }
 
-@keyframes blob2 {
+@keyframes smoothFloat2 {
     0%, 100% {
-        transform: translate(0px, 0px) scale(1) rotate(0deg);
+        transform: translate(0px, 0px) rotate(0deg) scale(1);
     }
     33% {
-        transform: translate(-70px, -50px) scale(1.4) rotate(120deg);
+        transform: translate(-35px, 25px) rotate(-18deg) scale(1.15);
     }
     66% {
-        transform: translate(50px, 70px) scale(0.8) rotate(240deg);
+        transform: translate(45px, -35px) rotate(12deg) scale(0.85);
     }
 }
 
-@keyframes blob3 {
+@keyframes smoothFloat3 {
     0%, 100% {
-        transform: translate(0px, 0px) scale(1) rotate(0deg);
+        transform: translate(0px, 0px) rotate(0deg) scale(1);
     }
     20% {
-        transform: translate(40px, 40px) scale(0.9) rotate(72deg);
+        transform: translate(25px, 30px) rotate(8deg) scale(0.95);
     }
     40% {
-        transform: translate(-60px, -30px) scale(1.2) rotate(144deg);
+        transform: translate(-40px, -15px) rotate(-22deg) scale(1.2);
     }
     60% {
-        transform: translate(30px, -70px) scale(1.1) rotate(216deg);
+        transform: translate(15px, -45px) rotate(16deg) scale(0.8);
     }
     80% {
-        transform: translate(-20px, 50px) scale(0.85) rotate(288deg);
+        transform: translate(-25px, 35px) rotate(-12deg) scale(1.1);
     }
 }
 
-@keyframes blob4 {
+@keyframes smoothFloat4 {
     0%, 100% {
-        transform: translate(0px, 0px) scale(1) rotate(0deg);
+        transform: translate(0px, 0px) rotate(0deg) scale(1);
     }
     50% {
-        transform: translate(-100px, 80px) scale(1.5) rotate(180deg);
+        transform: translate(60px, 50px) rotate(25deg) scale(1.3);
     }
 }
 
-@keyframes blob5 {
+@keyframes smoothFloat5 {
     0%, 100% {
-        transform: translate(0px, 0px) scale(1) rotate(0deg);
-    }
-    25% {
-        transform: translate(90px, -60px) scale(0.6) rotate(90deg);
-    }
-    75% {
-        transform: translate(-50px, 90px) scale(1.3) rotate(270deg);
-    }
-}
-
-@keyframes blob6 {
-    0%, 100% {
-        transform: translate(0px, 0px) scale(1) rotate(0deg);
-    }
-    33% {
-        transform: translate(-80px, -40px) scale(1.2) rotate(120deg);
-    }
-    66% {
-        transform: translate(60px, 80px) scale(0.8) rotate(240deg);
-    }
-}
-
-@keyframes blob7 {
-    0%, 100% {
-        transform: translate(0px, 0px) scale(1) rotate(0deg);
-    }
-    25% {
-        transform: translate(120px, -100px) scale(1.3) rotate(90deg);
-    }
-    50% {
-        transform: translate(-80px, 60px) scale(0.7) rotate(180deg);
-    }
-    75% {
-        transform: translate(40px, -120px) scale(1.2) rotate(270deg);
-    }
-}
-
-@keyframes blob8 {
-    0%, 100% {
-        transform: translate(0px, 0px) scale(1) rotate(0deg);
-    }
-    20% {
-        transform: translate(-60px, 40px) scale(1.3) rotate(72deg);
-    }
-    40% {
-        transform: translate(80px, -60px) scale(0.7) rotate(144deg);
-    }
-    60% {
-        transform: translate(-40px, -80px) scale(1.1) rotate(216deg);
-    }
-    80% {
-        transform: translate(100px, 20px) scale(0.9) rotate(288deg);
-    }
-}
-
-@keyframes blob9 {
-    0%, 100% {
-        transform: translate(0px, 0px) scale(1) rotate(0deg);
-    }
-    33% {
-        transform: translate(150px, -80px) scale(1.3) rotate(120deg);
-    }
-    66% {
-        transform: translate(-100px, 120px) scale(0.7) rotate(240deg);
-    }
-}
-
-@keyframes blob10 {
-    0%, 100% {
-        transform: translate(0px, 0px) scale(1) rotate(0deg);
+        transform: translate(0px, 0px) rotate(0deg) scale(1);
     }
     16% {
-        transform: translate(70px, 50px) scale(1.2) rotate(60deg);
+        transform: translate(20px, -25px) rotate(5deg) scale(1.05);
     }
     32% {
-        transform: translate(-50px, -70px) scale(0.8) rotate(120deg);
+        transform: translate(-30px, 10px) rotate(-15deg) scale(0.9);
     }
     48% {
-        transform: translate(90px, -40px) scale(1.4) rotate(180deg);
+        transform: translate(35px, 40px) rotate(10deg) scale(1.15);
     }
     64% {
-        transform: translate(-80px, 60px) scale(0.7) rotate(240deg);
+        transform: translate(-15px, -35px) rotate(-8deg) scale(0.95);
     }
     80% {
-        transform: translate(40px, 80px) scale(1.1) rotate(300deg);
-    }
-}
-
-/* SUPER FAST NEW ANIMATIONS */
-@keyframes blob11 {
-    0%, 100% {
-        transform: translate(0px, 0px) scale(1) rotate(0deg);
-    }
-    50% {
-        transform: translate(-120px, 100px) scale(1.8) rotate(180deg);
-    }
-}
-
-@keyframes blob12 {
-    0%, 100% {
-        transform: translate(0px, 0px) scale(1) rotate(0deg);
-    }
-    25% {
-        transform: translate(80px, -90px) scale(0.5) rotate(90deg);
-    }
-    75% {
-        transform: translate(-60px, 70px) scale(1.6) rotate(270deg);
-    }
-}
-
-@keyframes blob13 {
-    0%, 100% {
-        transform: translate(0px, 0px) scale(1) rotate(0deg);
-    }
-    33% {
-        transform: translate(140px, -60px) scale(1.3) rotate(120deg);
-    }
-    66% {
-        transform: translate(-100px, 110px) scale(0.7) rotate(240deg);
-    }
-}
-
-@keyframes blob14 {
-    0%, 100% {
-        transform: translate(0px, 0px) scale(1) rotate(0deg);
-    }
-    20% {
-        transform: translate(-90px, 50px) scale(1.3) rotate(72deg);
-    }
-    40% {
-        transform: translate(70px, -80px) scale(0.7) rotate(144deg);
-    }
-    60% {
-        transform: translate(-50px, -90px) scale(1.5) rotate(216deg);
-    }
-    80% {
-        transform: translate(110px, 30px) scale(0.8) rotate(288deg);
-    }
-}
-
-@keyframes blob15 {
-    0%, 100% {
-        transform: translate(0px, 0px) scale(1) rotate(0deg);
-    }
-    50% {
-        transform: translate(200px, -150px) scale(1.2) rotate(180deg);
-    }
-}
-
-@keyframes blob16 {
-    0%, 100% {
-        transform: translate(0px, 0px) scale(1) rotate(0deg);
-    }
-    30% {
-        transform: translate(-80px, 90px) scale(1.4) rotate(108deg);
-    }
-    70% {
-        transform: translate(120px, -70px) scale(0.6) rotate(252deg);
-    }
-}
-
-@keyframes blob17 {
-    0%, 100% {
-        transform: translate(0px, 0px) scale(1) rotate(0deg);
-    }
-    40% {
-        transform: translate(-110px, -80px) scale(1.7) rotate(144deg);
-    }
-    80% {
-        transform: translate(90px, 100px) scale(0.5) rotate(288deg);
+        transform: translate(25px, 15px) rotate(18deg) scale(1.08);
     }
 }
 
@@ -1626,11 +1331,20 @@ section {
     .profile-card {
         grid-template-columns: 1fr;
         text-align: center;
-        gap: 1.5rem;
+        gap: 2rem; /* Increased spacing */
         padding: 1.5rem;
         /* Remove backdrop blur on mobile for performance */
         backdrop-filter: none;
         background: rgba(0, 0, 0, 0.8);
+    }
+    
+    /* Improve spacing between profile elements on mobile */
+    .profile-info {
+        margin-top: 1rem; /* Add space above name/description */
+    }
+    
+    .status-indicator {
+        margin-top: 1.5rem; /* Push status indicator down */
     }
     
     .tech-stack-section,
