@@ -21,16 +21,16 @@ input:active {
 :root {
     /* Dynamic Theme Colors - Initially neutral until profile image loads */
     --bg-primary: #0a0a0f;
-    --bg-secondary: rgba(0, 0, 0, 0.85);
-    --bg-tertiary: rgba(0, 0, 0, 0.7);
+    --bg-secondary: rgba(0, 0, 0, 0.3);
+    --bg-tertiary: rgba(0, 0, 0, 0.3);
     --text-primary: #e0e6ed;
-    --text-secondary: #a8b2d1;
+    --text-secondary: #a2a3a5;
     --text-muted: #6b7785;
     --accent-primary: transparent; /* Start transparent until colors load */
     --accent-secondary: transparent;
     --accent-tertiary: transparent;
     --gradient-primary: transparent;
-    --border-color: #232538;
+    --border-color: #000000;
     --shadow-glow: 0 0 20px transparent;
     --shadow-strong: 0 8px 32px rgba(0, 0, 0, 0.4);
     
@@ -283,7 +283,7 @@ body {
 }
 
 .profile-card {
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.3);
     border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 1.5rem;
@@ -515,7 +515,7 @@ body {
     align-items: center;
     gap: 0.5rem;
     padding: 0.6rem 1rem;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.3);
     color: var(--text-primary);
     text-decoration: none;
     border: 1px solid var(--border-color);
@@ -627,7 +627,7 @@ section {
 /* Tech Stack Section - 18% height */
 .tech-stack-section {
     height: 18vh;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.3);
     border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 0.75rem;
@@ -658,7 +658,7 @@ section {
     justify-content: center;
     gap: 0.3rem;
     padding: 0.5rem 0.4rem;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.3);
     border: 1px solid var(--border-color);
     border-radius: 10px;
     transition: all 0.3s ease;
@@ -869,7 +869,7 @@ section {
 /* Projects Section - 48% height with horizontal scroll */
 .projects-section {
     height: 48vh;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.3);
     border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 1.5rem;
@@ -889,8 +889,9 @@ section {
     gap: 1.5rem;
     flex: 1;
     overflow-x: auto;
-    overflow-y: hidden;
-    padding-bottom: 10px;
+    overflow-y: visible; /* Allow 3D effects to show above/below */
+    padding: 15px 10px 15px 10px; /* Add padding to prevent 3D clipping */
+    margin: -15px -10px -15px -10px; /* Negative margin to maintain layout */
     /* Scroll indicators */
     scrollbar-width: thin;
     scrollbar-color: var(--accent-primary) transparent;
@@ -915,7 +916,7 @@ section {
 }
 
 .project-card {
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.3);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 0.9rem;

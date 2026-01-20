@@ -54,8 +54,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         translateX(${translateX.toFixed(2)}px) 
                         translateY(${translateY.toFixed(2)}px) 
                         translateZ(${(15 * intensity).toFixed(2)}px)
-                        scale(${(1 + intensity * 0.03).toFixed(3)})
                     `;
+                    // NO SCALING - removed scale() to prevent clipping
                     
                     // Dynamic shadow based on rotation
                     const shadowX = Math.max(-15, Math.min(15, rotateY * -0.8));
@@ -85,7 +85,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 element.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease-out';
-                element.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateX(0px) translateY(0px) translateZ(0px) scale(1)';
+                element.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateX(0px) translateY(0px) translateZ(0px)';
+                // NO SCALING - removed scale(1) to prevent clipping
                 
                 // Reset shadow after transition
                 setTimeout(() => {

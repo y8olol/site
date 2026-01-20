@@ -1,0 +1,91 @@
+/* REMOVE BLUE OUTLINES - Make them black/invisible */
+
+/* Global outline reset - Remove all default browser outlines */
+*,
+*:before,
+*:after {
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Remove default focus outlines and active states */
+*:focus,
+*:active,
+button:focus,
+button:active,
+a:focus,
+a:active,
+input:focus,
+input:active,
+textarea:focus,
+textarea:active,
+select:focus,
+select:active {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Custom focus styles for accessibility - use dark theme colors */
+.tech-item:focus,
+.project-card:focus,
+.social-link:focus,
+button:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.3) !important;
+    outline-offset: 2px !important;
+}
+
+/* Remove blue highlighting on mobile taps */
+* {
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+}
+
+/* Allow text selection where needed */
+.project-description,
+.tagline,
+.name-main,
+.notification,
+input,
+textarea {
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
+}
+
+/* Remove any lingering browser focus styles */
+input:focus,
+textarea:focus,
+button:focus,
+a:focus {
+    outline: 0 !important;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2) !important;
+    border-color: var(--accent-primary, #00d4ff) !important;
+}
+
+/* Remove autofill styling */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--bg-secondary) inset !important;
+    box-shadow: 0 0 0 30px var(--bg-secondary) inset !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+}
+
+/* Custom selection colors */
+::selection {
+    background: var(--accent-primary, #00d4ff) !important;
+    color: var(--bg-primary, #000) !important;
+}
+
+::-moz-selection {
+    background: var(--accent-primary, #00d4ff) !important;
+    color: var(--bg-primary, #000) !important;
+}
