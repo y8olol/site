@@ -384,20 +384,74 @@ class ProfileLoader {
 
     async loadGitHubRepos() {
         try {
-            console.log('📂 Loading GitHub repositories...');
-            const response = await fetch(`https://api.github.com/users/${this.github_username}/repos?sort=updated&per_page=12`);
+            console.log('📂 Loading GitHub repositories with automatic language detection...');
             
-            if (response.ok) {
-                const repos = await response.json();
-                const featuredRepos = repos.filter(repo => 
+            // Fetch all repositories
+            const reposResponse = await fetch(`https://api.github.com/users/${this.github_username}/repos?sort=updated&per_page=50`);
+            
+            if (reposResponse.ok) {
+                const allRepos = await reposResponse.json();
+                
+                // Filter out forks and profile repos, but include all legitimate projects
+                const validRepos = allRepos.filter(repo => 
                     !repo.fork && 
                     repo.name !== this.github_username &&
-                    repo.description &&
-                    !repo.name.includes('.')
-                ).slice(0, 6);
-
-                this.renderProjects(featuredRepos);
-                console.log('✅ GitHub repositories loaded');
+                    !repo.name.includes('.github.io') &&
+                    repo.size > 0 // Has actual content
+                );
+                
+                console.log(`📊 Found ${validRepos.length} valid repositories`);
+                
+                // Fetch languages for each repository
+                const reposWithLanguages = await Promise.all(
+                    validRepos.map(async (repo) => {
+                        try {
+                            const langResponse = await fetch(repo.languages_url);
+                            const languages = langResponse.ok ? await langResponse.json() : {};
+                            
+                            // Get the primary language (most used)
+                            const languageEntries = Object.entries(languages);
+                            const primaryLanguage = languageEntries.length > 0 
+                                ? languageEntries.sort((a, b) => b[1] - a[1])[0][0]
+                                : repo.language || 'Unknown';
+                            
+                            return {
+                                ...repo,
+                                languages,
+                                primaryLanguage,
+                                languageCount: Object.keys(languages).length,
+                                totalBytes: Object.values(languages).reduce((sum, bytes) => sum + bytes, 0)
+                            };
+                        } catch (error) {
+                            console.warn(`Failed to fetch languages for ${repo.name}:`, error);
+                            return {
+                                ...repo,
+                                languages: {},
+                                primaryLanguage: repo.language || 'Unknown',
+                                languageCount: 0,
+                                totalBytes: 0
+                            };
+                        }
+                    })
+                );
+                
+                // Sort by criteria: stars, recent activity, language diversity
+                const sortedRepos = reposWithLanguages.sort((a, b) => {
+                    // Score based on stars, recent activity, and language diversity
+                    const scoreA = (a.stargazers_count * 10) + 
+                                  (a.languageCount * 5) + 
+                                  (new Date(a.updated_at) > new Date(Date.now() - 90 * 24 * 60 * 60 * 1000) ? 20 : 0);
+                    const scoreB = (b.stargazers_count * 10) + 
+                                  (b.languageCount * 5) + 
+                                  (new Date(b.updated_at) > new Date(Date.now() - 90 * 24 * 60 * 60 * 1000) ? 20 : 0);
+                    return scoreB - scoreA;
+                });
+                
+                // Take the top 6 repositories
+                const featuredRepos = sortedRepos.slice(0, 6);
+                
+                this.renderProjectsWithLanguages(featuredRepos);
+                console.log('✅ GitHub repositories loaded with automatic language detection');
             } else {
                 console.warn('Failed to load GitHub repositories');
                 this.renderFallbackProjects();
@@ -408,31 +462,66 @@ class ProfileLoader {
         }
     }
 
-    renderProjects(repos) {
+    renderProjectsWithLanguages(repos) {
         const projectsGrid = document.getElementById('projects-grid');
         if (!projectsGrid) return;
 
-        projectsGrid.innerHTML = repos.map((repo, index) => `
-            <div class="project-card" style="animation-delay: ${index * 0.1}s">
-                <div class="project-header">
-                    <div>
-                        <h3 class="project-title">${this.formatRepoName(repo.name)}</h3>
-                        ${repo.language ? `<span class="project-language">${repo.language}</span>` : ''}
+        projectsGrid.innerHTML = repos.map((repo, index) => {
+            // Build language tags from the most used languages
+            const languageEntries = Object.entries(repo.languages || {})
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3); // Show top 3 languages
+            
+            const languageTags = languageEntries.length > 0 
+                ? languageEntries.map(([lang, bytes]) => {
+                    const percentage = repo.totalBytes > 0 
+                        ? Math.round((bytes / repo.totalBytes) * 100)
+                        : 0;
+                    
+                    return `<span class="project-language" data-language="${lang.toLowerCase()}" title="${percentage}% of codebase">${lang}</span>`;
+                }).join('')
+                : (repo.primaryLanguage ? `<span class="project-language" data-language="${repo.primaryLanguage.toLowerCase()}">${repo.primaryLanguage}</span>` : '');
+            
+            // Use description if available, otherwise generate one based on languages
+            const description = repo.description || this.generateDescriptionFromLanguages(repo.languages, repo.primaryLanguage);
+            
+            // Add repository stats
+            const stats = [];
+            if (repo.stargazers_count > 0) stats.push(`⭐ ${repo.stargazers_count}`);
+            if (repo.forks_count > 0) stats.push(`🔀 ${repo.forks_count}`);
+            if (Object.keys(repo.languages || {}).length > 1) stats.push(`🔧 ${Object.keys(repo.languages || {}).length} languages`);
+            
+            const statsHtml = stats.length > 0 
+                ? `<div class="project-stats">${stats.join(' • ')}</div>`
+                : '';
+            
+            return `
+                <div class="project-card" style="animation-delay: ${index * 0.1}s" data-repo="${repo.name}">
+                    <div class="project-header">
+                        <div>
+                            <h3 class="project-title">${this.formatRepoName(repo.name)}</h3>
+                            <div class="project-languages">${languageTags}</div>
+                        </div>
+                    </div>
+                    <p class="project-description">${description}</p>
+                    ${statsHtml}
+                    <div class="project-footer">
+                        <a href="${repo.html_url}" target="_blank" class="project-link">
+                            <span>View Project</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                            </svg>
+                        </a>
+                        <div class="project-updated" title="Last updated: ${new Date(repo.updated_at).toLocaleDateString()}">
+                            Updated ${this.getRelativeTime(repo.updated_at)}
+                        </div>
                     </div>
                 </div>
-                <p class="project-description">
-                    ${this.enhanceDescription(repo.description)}
-                </p>
-                <a href="${repo.html_url}" target="_blank" class="project-link">
-                    <span>View Project</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M7 17L17 7M17 7H7M17 7V17"/>
-                    </svg>
-                </a>
-            </div>
-        `).join('');
+            `;
+        }).join('');
 
         this.animateProjectCards();
+        this.addLanguageHoverEffects();
     }
 
     renderFallbackProjects() {
@@ -487,11 +576,87 @@ class ProfileLoader {
         this.animateProjectCards();
     }
 
-    enhanceDescription(description) {
-        if (!description) return 'A project focused on automation and practical solutions.';
+    generateDescriptionFromLanguages(languages, primaryLanguage) {
+        if (!languages || Object.keys(languages).length === 0) {
+            return `A ${primaryLanguage || 'software'} project focused on automation and practical solutions.`;
+        }
         
-        // Just return the description as-is, no more highlights
-        return description;
+        const langNames = Object.keys(languages);
+        const descriptions = {
+            'JavaScript': 'Interactive web application with modern JavaScript',
+            'Python': 'Automation and data processing tool',
+            'C#': 'Desktop application with modern UI',
+            'Java': 'Cross-platform application',
+            'TypeScript': 'Type-safe web application',
+            'HTML': 'Web interface and user experience',
+            'CSS': 'Styled web interface',
+            'Go': 'High-performance backend service',
+            'Rust': 'Systems programming project',
+            'PHP': 'Web backend and API development',
+            'Ruby': 'Web application with Ruby framework',
+            'Swift': 'iOS/macOS native application',
+            'Kotlin': 'Android or multiplatform application'
+        };
+        
+        if (langNames.length === 1) {
+            return descriptions[primaryLanguage] || `${primaryLanguage} application with practical functionality`;
+        } else {
+            const primaryDesc = descriptions[primaryLanguage] || `${primaryLanguage} application`;
+            const otherLangs = langNames.filter(lang => lang !== primaryLanguage).slice(0, 2);
+            return `${primaryDesc} with ${otherLangs.join(' and ')} integration`;
+        }
+    }
+    
+    getRelativeTime(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffInMs = now - date;
+        const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+        
+        if (diffInDays === 0) return 'today';
+        if (diffInDays === 1) return 'yesterday';
+        if (diffInDays < 7) return `${diffInDays} days ago`;
+        if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
+        if (diffInDays < 365) return `${Math.floor(diffInDays / 30)} months ago`;
+        return `${Math.floor(diffInDays / 365)} years ago`;
+    }
+    
+    addLanguageHoverEffects() {
+        // Add hover effects for language tags
+        document.querySelectorAll('.project-language').forEach(tag => {
+            const language = tag.dataset.language;
+            const languageColors = {
+                'javascript': '#f7df1e',
+                'python': '#3776ab',
+                'c#': '#512bd4',
+                'typescript': '#3178c6',
+                'java': '#ed8b00',
+                'html': '#e34f26',
+                'css': '#1572b6',
+                'go': '#00add8',
+                'rust': '#ce422b',
+                'php': '#777bb4',
+                'ruby': '#cc342d',
+                'swift': '#fa7343',
+                'kotlin': '#7f52ff',
+                'c++': '#00599c',
+                'c': '#a8b9cc'
+            };
+            
+            if (languageColors[language]) {
+                tag.style.setProperty('--lang-color', languageColors[language]);
+                tag.addEventListener('mouseenter', () => {
+                    tag.style.backgroundColor = languageColors[language] + '20';
+                    tag.style.borderColor = languageColors[language];
+                    tag.style.color = languageColors[language];
+                });
+                tag.addEventListener('mouseleave', () => {
+                    tag.style.backgroundColor = '';
+                    tag.style.borderColor = '';
+                    tag.style.color = '';
+                });
+            }
+        });
     }
 
     formatRepoName(name) {
@@ -538,18 +703,605 @@ class ProfileLoader {
         const statusIndicator = document.getElementById('discord-status');
         const discordLink = document.getElementById('discord-link');
         
-        // Show default status
-        statusIndicator.querySelector('.status-text').textContent = 'Available';
-        statusIndicator.classList.add('online');
+        if (!this.discord_user_id) {
+            // No Discord ID provided - show default
+            statusIndicator.querySelector('.status-text').textContent = 'Available';
+            statusIndicator.classList.add('online');
+            discordLink.href = '#';
+            discordLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.showDiscordMessage();
+            });
+            return;
+        }
+
+        // Try to fetch real Discord status
+        this.fetchDiscordStatus();
+    }
+
+    async fetchDiscordStatus() {
+        console.log('💬 Fetching Discord status for user:', this.discord_user_id);
+        const statusIndicator = document.getElementById('discord-status');
+        const discordLink = document.getElementById('discord-link');
+        
+        // Show loading state
+        statusIndicator.querySelector('.status-text').textContent = 'Checking...';
+        statusIndicator.classList.add('loading');
+        
+        try {
+            console.log('🔄 Fetching REAL Discord status via Lanyard...');
+            const response = await fetch(`https://api.lanyard.rest/v1/users/${this.discord_user_id}`);
+            
+            if (response.ok) {
+                const data = await response.json();
+                console.log('✅ Lanyard API success - Full Discord data:', data);
+                
+                if (this.parseRealDiscordStatus(data)) {
+                    return; // Success with real status!
+                }
+            } else {
+                console.log('⚠️ Lanyard API failed with status:', response.status);
+            }
+        } catch (error) {
+            console.log('⚠️ Lanyard API error:', error.message);
+        }
+        
+        // Fallback to intelligent status simulation
+        console.log('🔄 Using intelligent status simulation...');
+        this.showIntelligentStatus();
+    }
+
+    parseRealDiscordStatus(data) {
+        console.log('🔄 Parsing real Discord data from Lanyard...');
+        const statusIndicator = document.getElementById('discord-status');
+        const discordLink = document.getElementById('discord-link');
+        
+        statusIndicator.classList.remove('loading');
+        
+        if (!data.data) {
+            console.log('⚠️ No Discord data found');
+            return false;
+        }
+        
+        const discordData = data.data;
+        const user = discordData.discord_user;
+        const status = discordData.discord_status;
+        const activities = discordData.activities || [];
+        
+        // Extract user info
+        const username = user?.username || 'y8o';
+        const discriminator = user?.discriminator;
+        const avatar = user?.avatar;
+        const primaryGuild = user?.primary_guild;
+        const publicFlags = user?.public_flags;
+        
+        // Find custom status activity
+        const customStatus = activities.find(activity => activity.type === 4);
+        
+        // Extract presence info
+        const listeningToSpotify = discordData.listening_to_spotify;
+        const spotify = discordData.spotify;
+        const activeDevices = {
+            web: discordData.active_on_discord_web,
+            desktop: discordData.active_on_discord_desktop,
+            mobile: discordData.active_on_discord_mobile
+        };
+        
+        console.log('✅ Parsed Discord data:', {
+            status,
+            username,
+            customStatus: customStatus?.state,
+            emoji: customStatus?.emoji,
+            guild: primaryGuild?.tag,
+            spotify: listeningToSpotify
+        });
+        
+        // Update UI with real Discord data
+        this.updateRealDiscordUI({
+            status,
+            username,
+            discriminator,
+            avatar,
+            customStatus,
+            primaryGuild,
+            activeDevices,
+            spotify: listeningToSpotify ? spotify : null,
+            publicFlags
+        });
+        
+        return true;
+    }
+
+    updateRealDiscordUI(discordData) {
+        const { status, username, discriminator, avatar, customStatus, primaryGuild, activeDevices, spotify, publicFlags } = discordData;
+        const statusIndicator = document.getElementById('discord-status');
+        const discordLink = document.getElementById('discord-link');
+        
+        // Status mapping with emoji support
+        const statusMap = {
+            'online': { text: 'Online', class: 'online', color: '#22c55e', emoji: '�︠' },
+            'idle': { text: 'Away', class: 'idle', color: '#f59e0b', emoji: '🌙' },
+            'dnd': { text: 'Busy', class: 'dnd', color: '#ef4444', emoji: '🔴' },
+            'offline': { text: 'Offline', class: 'offline', color: '#6b7280', emoji: '⚪' }
+        };
+        
+        const statusInfo = statusMap[status] || statusMap['offline'];
+        
+        // Update status indicator
+        statusIndicator.querySelector('.status-text').textContent = statusInfo.text;
+        statusIndicator.className = 'status-indicator ' + statusInfo.class;
+        statusIndicator.querySelector('.status-dot').style.background = statusInfo.color;
+        
+        // Build display name with discriminator if needed
+        const displayName = discriminator && discriminator !== '0' ? 
+            `${username}#${discriminator}` : username;
+        
+        // Discord link functionality - Fixed to pass formatted data
+        discordLink.href = '#';
+        // Remove existing event listeners by replacing the element
+        const newDiscordLink = discordLink.cloneNode(true);
+        discordLink.parentNode.replaceChild(newDiscordLink, discordLink);
+        
+        newDiscordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Format the data properly for the popup
+            let customStatusText = '';
+            if (customStatus && customStatus.state) {
+                let emojiText = '';
+                if (customStatus.emoji) {
+                    if (customStatus.emoji.id) {
+                        // Custom Discord emoji
+                        emojiText = `<img src="https://cdn.discordapp.com/emojis/${customStatus.emoji.id}.${customStatus.emoji.animated ? 'gif' : 'png'}" alt="${customStatus.emoji.name}" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;">`;
+                    } else {
+                        // Unicode emoji
+                        emojiText = customStatus.emoji.name + ' ';
+                    }
+                }
+                customStatusText = emojiText + (customStatus.state || '');
+            }
+            
+            // Format active devices
+            const activeDevicesList = [];
+            if (activeDevices && activeDevices.desktop) activeDevicesList.push('💻 Desktop');
+            if (activeDevices && activeDevices.web) activeDevicesList.push('🌍 Web');
+            if (activeDevices && activeDevices.mobile) activeDevicesList.push('📱 Mobile');
+            
+            // Call the popup with properly formatted data (guild removed)
+            this.showRealDiscordContact({
+                status: statusInfo.text,
+                statusEmoji: statusInfo.emoji,
+                username: displayName,
+                customStatus: customStatusText,
+                guild: null, // Hide guild information
+                spotify,
+                activeDevices: activeDevicesList,
+                avatar: avatar
+            });
+        });
+        
+        console.log(`✅ Real Discord status updated: ${displayName} is ${statusInfo.text}`);
+        
+        // Auto-refresh every 30 seconds to keep status current
+        setTimeout(() => {
+            this.fetchDiscordStatus();
+        }, 30 * 1000); // 30 seconds for real status
+    }
+
+    showIntelligentStatus() {
+        const statusIndicator = document.getElementById('discord-status');
+        const discordLink = document.getElementById('discord-link');
+        
+        statusIndicator.classList.remove('loading');
+        
+        // Intelligent status based on time of day and patterns
+        const now = new Date();
+        const hour = now.getHours();
+        const day = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+        const isWeekend = day === 0 || day === 6;
+        
+        let status, statusText, explanation;
+        
+        if (hour >= 9 && hour <= 17 && !isWeekend) {
+            // Business hours on weekdays - likely DND (working)
+            status = 'dnd';
+            statusText = 'Busy';
+            explanation = 'Working hours - focused on coding';
+        } else if ((hour >= 18 && hour <= 23) || (hour >= 7 && hour <= 8)) {
+            // Evening/morning - likely online
+            status = 'online';
+            statusText = 'Online';
+            explanation = 'Available for collaborations';
+        } else if (hour >= 0 && hour <= 6) {
+            // Late night/early morning - likely offline
+            status = 'offline';
+            statusText = 'Offline';
+            explanation = 'Probably sleeping';
+        } else {
+            // Default to idle
+            status = 'idle';
+            statusText = 'Away';
+            explanation = 'Step away from computer';
+        }
+        
+        // Weekend adjustments
+        if (isWeekend) {
+            if (hour >= 10 && hour <= 20) {
+                status = 'online';
+                statusText = 'Online';
+                explanation = 'Weekend - available for side projects';
+            } else if (hour >= 21 && hour <= 23) {
+                status = 'idle';
+                statusText = 'Away';
+                explanation = 'Weekend evening';
+            }
+        }
+        
+        const statusMap = {
+            'online': { color: '#22c55e', class: 'online' },
+            'idle': { color: '#f59e0b', class: 'idle' },
+            'dnd': { color: '#ef4444', class: 'dnd' },
+            'offline': { color: '#6b7280', class: 'offline' }
+        };
+        
+        const statusInfo = statusMap[status];
+        
+        // Update indicator
+        statusIndicator.querySelector('.status-text').textContent = statusText;
+        statusIndicator.className = 'status-indicator ' + statusInfo.class;
+        statusIndicator.querySelector('.status-dot').style.background = statusInfo.color;
+        
+        // Update Discord link
         discordLink.href = '#';
         discordLink.addEventListener('click', (e) => {
             e.preventDefault();
-            this.showDiscordMessage();
+            this.showEnhancedDiscordContact(statusText, explanation);
         });
+        
+        console.log(`✅ Intelligent status: ${statusText} (${explanation})`);
+        
+        // Add subtle animation to make it feel more "live"
+        this.addStatusAnimation();
+        
+        // Update status every 5 minutes to keep it dynamic
+        setTimeout(() => {
+            this.showIntelligentStatus();
+        }, 5 * 60 * 1000); // 5 minutes
     }
-
-    showDiscordMessage() {
-        this.showNotification('User: y8o');
+    
+    addStatusAnimation() {
+        const statusDot = document.querySelector('.status-dot');
+        if (statusDot) {
+            statusDot.style.animation = 'none';
+            setTimeout(() => {
+                statusDot.style.animation = 'pulse 2s ease-in-out infinite';
+            }, 100);
+        }
+    }
+    
+    showEnhancedDiscordContact(currentStatus, explanation) {
+        // Create enhanced popup with status context
+        const popup = document.createElement('div');
+        popup.className = 'discord-contact-popup';
+        popup.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 420px;
+            z-index: 2000;
+            box-shadow: var(--shadow-strong);
+            backdrop-filter: blur(10px);
+            text-align: center;
+        `;
+        
+        const statusEmoji = {
+            'Online': '�️',
+            'Busy': '🔴',
+            'Away': '🟊',
+            'Offline': '⚪'
+        };
+        
+        popup.innerHTML = `
+            <div style="margin-bottom: 1.5rem;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">💬</div>
+                <h3 style="color: var(--text-primary); margin-bottom: 0.5rem; font-size: 1.3rem;"></h3>
+                <p style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.9rem; font-style: italic;">Status: ${currentStatus} - ${explanation}</p>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.5;">Connect with me for coding collaborations, project discussions, and tech partnerships!</p>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 0.25rem;">Discord Username</div>
+                    <div style="color: var(--accent-primary); font-family: monospace; font-size: 1.1rem; font-weight: 600;">y8o</div>
+                </div>
+                <div style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4;">
+                    • Search for 'y8o' on Discord<br>
+                    • Find me in dev communities<br>
+                    • Always open to interesting projects!
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <button class="copy-discord-id" style="
+                    background: #5865f2;
+                    color: white;
+                    border: none;
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    transition: all 0.2s ease;
+                    font-size: 0.9rem;
+                ">Copy Username</button>
+                <button class="close-popup" style="
+                    background: transparent;
+                    color: var(--text-secondary);
+                    border: 1px solid var(--border-color);
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    transition: all 0.2s ease;
+                    font-size: 0.9rem;
+                ">Close</button>
+            </div>
+            
+            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); font-size: 0.8rem; color: var(--text-muted);">
+                Status updates automatically based on time patterns
+            </div>
+        `;
+        
+        // Add backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'discord-popup-backdrop';
+        backdrop.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1999;
+            backdrop-filter: blur(2px);
+        `;
+        
+        document.body.appendChild(backdrop);
+        document.body.appendChild(popup);
+        
+        // Add event listeners
+        const copyButton = popup.querySelector('.copy-discord-id');
+        const closeButton = popup.querySelector('.close-popup');
+        
+        copyButton.addEventListener('click', () => {
+            navigator.clipboard.writeText('y8o').then(() => {
+                copyButton.innerHTML = '✅ Copied!';
+                copyButton.style.background = '#22c55e';
+                setTimeout(() => {
+                    copyButton.innerHTML = 'Copy Username';
+                    copyButton.style.background = '#5865f2';
+                }, 2500);
+            }).catch(() => {
+                copyButton.innerHTML = 'Copy failed';
+                copyButton.style.background = '#ef4444';
+                setTimeout(() => {
+                    copyButton.innerHTML = 'Copy Username';
+                    copyButton.style.background = '#5865f2';
+                }, 2500);
+            });
+        });
+        
+        const closePopup = () => {
+            if (document.body.contains(backdrop)) document.body.removeChild(backdrop);
+            if (document.body.contains(popup)) document.body.removeChild(popup);
+        };
+        
+        closeButton.addEventListener('click', closePopup);
+        backdrop.addEventListener('click', closePopup);
+        
+        // Escape key to close
+        const escapeHandler = (e) => {
+            if (e.key === 'Escape') {
+                closePopup();
+                document.removeEventListener('keydown', escapeHandler);
+            }
+        };
+        document.addEventListener('keydown', escapeHandler);
+        
+        // Auto-close after 12 seconds
+        setTimeout(() => {
+            closePopup();
+            document.removeEventListener('keydown', escapeHandler);
+        }, 12000);
+    }
+    showRealDiscordContact(discordData) {
+        const { status, statusEmoji, username, customStatus, guild, spotify, activeDevices, avatar } = discordData;
+        
+        // Create enhanced popup with real Discord data
+        const popup = document.createElement('div');
+        popup.className = 'discord-contact-popup';
+        popup.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 480px;
+            z-index: 2000;
+            box-shadow: var(--shadow-strong);
+            backdrop-filter: blur(10px);
+            text-align: center;
+        `;
+        
+        // Build custom status section
+        let customStatusSection = '';
+        if (customStatus) {
+            customStatusSection = `
+                <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                    <div style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 0.25rem;">Custom Status</div>
+                    <div style="color: var(--text-primary); font-size: 0.9rem;">${customStatus}</div>
+                </div>
+            `;
+        }
+        
+        // Build guild section - REMOVED (no longer showing guild information)
+        let guildSection = '';
+        
+        // Build Spotify section
+        let spotifySection = '';
+        if (spotify && spotify.song) {
+            spotifySection = `
+                <div style="background: linear-gradient(90deg, #1db954, #1ed760); padding: 1rem; border-radius: 8px; margin: 1rem 0; color: white;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <div style="font-size: 1.2rem;">🎵</div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">Listening to Spotify</div>
+                    </div>
+                    <div style="font-weight: 600; font-size: 0.95rem;">${spotify.song}</div>
+                    ${spotify.artist ? `<div style="opacity: 0.9; font-size: 0.85rem;">by ${spotify.artist}</div>` : ''}
+                    ${spotify.album ? `<div style="opacity: 0.8; font-size: 0.8rem;">${spotify.album}</div>` : ''}
+                </div>
+            `;
+        }
+        
+        // Build active devices section
+        let devicesSection = '';
+        if (activeDevices && activeDevices.length > 0) {
+            devicesSection = `
+                <div style="margin: 1rem 0;">
+                    <div style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 0.5rem;">Active on</div>
+                    <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                        ${activeDevices.map(device => `
+                            <span style="background: var(--bg-tertiary); padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.75rem; color: var(--text-primary);">${device}</span>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        popup.innerHTML = `
+            <div style="margin-bottom: 1.5rem;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 1rem;">
+                    <div style="font-size: 1.5rem;"></div>
+                </div>
+                <h3 style="color: var(--text-primary); margin: 1rem 0 0.5rem; font-size: 1.2rem;"></h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.4;"></p>
+            </div>
+            
+            ${customStatusSection}
+            ${spotifySection}
+            ${devicesSection}
+            
+            <div style="margin: 1.5rem 0;">
+                <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 0.25rem;">Discord Username</div>
+                    <div style="color: var(--accent-primary); font-family: monospace; font-size: 1.1rem; font-weight: 600;">y8o</div>
+                </div>
+                <div style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4;">
+                    • Search for 'y8o' on Discord<br>
+                    • Always open to coding collaborations!<br>
+                    • Active in developer communities
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <button class="copy-discord-id" style="
+                    background: #5865f2;
+                    color: white;
+                    border: none;
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    transition: all 0.2s ease;
+                    font-size: 0.9rem;
+                ">Copy Username</button>
+                <button class="close-popup" style="
+                    background: transparent;
+                    color: var(--text-secondary);
+                    border: 1px solid var(--border-color);
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    transition: all 0.2s ease;
+                    font-size: 0.9rem;
+                ">Close</button>
+            </div>
+            
+            <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color); font-size: 0.8rem; color: var(--text-muted); line-height: 1.3;">
+                ✨ Real-time status via Lanyard API<br>
+                🔄 Auto-refreshes every 30 seconds
+            </div>
+        `;
+        
+        // Add backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'discord-popup-backdrop';
+        backdrop.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1999;
+            backdrop-filter: blur(2px);
+        `;
+        
+        document.body.appendChild(backdrop);
+        document.body.appendChild(popup);
+        
+        // Add event listeners
+        const copyButton = popup.querySelector('.copy-discord-id');
+        const closeButton = popup.querySelector('.close-popup');
+        
+        copyButton.addEventListener('click', () => {
+            navigator.clipboard.writeText(this.discord_user_id).then(() => {
+                copyButton.innerHTML = '✅ Copied!';
+                copyButton.style.background = '#22c55e';
+                setTimeout(() => {
+                    copyButton.innerHTML = 'Copy Discord ID';
+                    copyButton.style.background = '#5865f2';
+                }, 2500);
+            }).catch(() => {
+                copyButton.innerHTML = 'Copy failed';
+                copyButton.style.background = '#ef4444';
+                setTimeout(() => {
+                    copyButton.innerHTML = 'Copy Discord ID';
+                    copyButton.style.background = '#5865f2';
+                }, 2500);
+            });
+        });
+        
+        const closePopup = () => {
+            if (document.body.contains(backdrop)) document.body.removeChild(backdrop);
+            if (document.body.contains(popup)) document.body.removeChild(popup);
+        };
+        
+        closeButton.addEventListener('click', closePopup);
+        backdrop.addEventListener('click', closePopup);
+        
+        // Escape key to close
+        const escapeHandler = (e) => {
+            if (e.key === 'Escape') {
+                closePopup();
+                document.removeEventListener('keydown', escapeHandler);
+            }
+        };
+        document.addEventListener('keydown', escapeHandler);
+        
+        // Auto-close after 20 seconds (longer for rich content)
+        setTimeout(() => {
+            closePopup();
+            document.removeEventListener('keydown', escapeHandler);
+        }, 20000);
     }
 
     addInteractivity() {
@@ -796,7 +1548,13 @@ class ProfileLoader {
             
             element.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease-out';
             element.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateX(0px) translateY(0px) translateZ(0px) scale(1)';
-            element.style.boxShadow = '';
+            
+            // CRITICAL FIX: Don't reset box-shadow immediately, let CSS hover take over
+            setTimeout(() => {
+                if (!isHovering) { // Only clear if still not hovering
+                    element.style.boxShadow = '';
+                }
+            }, 100); // Small delay to prevent flickering
         });
     }
 
@@ -841,6 +1599,8 @@ class ProfileLoader {
             return 'rgba(55, 118, 171, 0.3)';
         } else if (element.classList.contains('csharp')) {
             return 'rgba(81, 43, 212, 0.3)';
+        } else if (element.classList.contains('java')) {
+            return 'rgba(237, 139, 0, 0.3)';
         } else if (element.classList.contains('nodejs')) {
             return 'rgba(51, 153, 51, 0.3)';
         } else if (element.classList.contains('ai')) {

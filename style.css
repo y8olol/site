@@ -21,8 +21,8 @@ input:active {
 :root {
     /* Dynamic Theme Colors - Initially neutral until profile image loads */
     --bg-primary: #0a0a0f;
-    --bg-secondary: #12121a;
-    --bg-tertiary: #1a1a2e;
+    --bg-secondary: rgba(0, 0, 0, 0.85);
+    --bg-tertiary: rgba(0, 0, 0, 0.7);
     --text-primary: #e0e6ed;
     --text-secondary: #a8b2d1;
     --text-muted: #6b7785;
@@ -41,6 +41,7 @@ input:active {
     --node-color: #339933;
     --ai-color: #ff6b35;
     --automation-color: #8a2be2;
+    --java-color: #ed8b00;
 }
 
 body {
@@ -521,13 +522,13 @@ body {
     mix-blend-mode: screen;
 }
 
-/* Animated Background Grid (keep as subtle overlay) */
+/* Animated Background Grid - FIXED coverage */
 .bg-grid {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: -50px;  /* Extend beyond viewport */
+    left: -50px; /* Extend beyond viewport */
+    width: calc(100% + 100px); /* Wider than viewport */
+    height: calc(100% + 100px); /* Taller than viewport */
     pointer-events: none;
     background-image: 
         linear-gradient(rgba(0, 212, 255, 0.05) 1px, transparent 1px),
@@ -649,6 +650,84 @@ body {
 
 .status-indicator.dnd .status-dot {
     background: #ef4444;
+}
+
+/* Enhanced Discord Status */
+.discord-status-enhanced {
+    position: absolute;
+    bottom: -8px;
+    right: -8px;
+    z-index: 10;
+    min-width: 120px;
+    background: rgba(30, 31, 34, 0.95);
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--border-color);
+    border-radius: 20px;
+    padding: 8px 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.discord-status-enhanced:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.status-indicator-main {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0px;
+}
+
+.discord-rich-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.custom-status {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.custom-status img {
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+.guild-tag {
+    display: none !important; /* Hide guild tag completely */
+}
+
+.guild-badge {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .discord-status-enhanced {
+        position: static;
+        margin-top: 12px;
+        margin-bottom: 0;
+        align-self: center;
+    }
 }
 
 .profile-info {
@@ -980,6 +1059,24 @@ section {
 .tech-item.automation:hover {
     border-color: var(--automation-color);
     box-shadow: 0 0 20px rgba(138, 43, 226, 0.2);
+}
+
+.tech-item.java {
+    --lang-color: var(--java-color);
+}
+
+.tech-item.java .tech-icon {
+    border: 2px solid var(--java-color);
+    color: var(--java-color);
+}
+
+.tech-item.java::before {
+    background: var(--java-color);
+}
+
+.tech-item.java:hover {
+    border-color: var(--java-color);
+    box-shadow: 0 0 20px rgba(237, 139, 0, 0.2);
 }
 
 /* Projects Section */
