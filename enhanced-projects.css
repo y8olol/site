@@ -16,15 +16,115 @@
     color: var(--text-secondary);
     font-family: 'JetBrains Mono', monospace;
     font-weight: 500;
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     white-space: nowrap;
     cursor: pointer;
     position: relative;
+    /* Prevent color flashing on hover off - STRONG */
+    backface-visibility: hidden;
+    /* Lock in original colors */
+    --original-bg: var(--bg-tertiary);
+    --original-color: var(--text-secondary);
+    --original-border: var(--border-color);
 }
 
 .project-language:hover {
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    /* CRITICAL: Keep original colors - never go gray */
+    color: var(--original-color, var(--text-secondary)) !important;
+    border-color: var(--original-border, var(--border-color)) !important;
+    background: var(--original-bg, var(--bg-tertiary)) !important;
+}
+
+/* CRITICAL: Force return to original state after hover */
+.project-language {
+    /* Default neutral state */
+    color: var(--text-secondary) !important;
+    background: var(--bg-tertiary) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Language-specific colors override - CRITICAL */
+.project-language[data-lang="javascript"],
+.project-language.javascript {
+    color: var(--js-color) !important;
+    border-color: var(--js-color) !important;
+}
+
+.project-language[data-lang="python"],
+.project-language.python {
+    color: var(--python-color) !important;
+    border-color: var(--python-color) !important;
+}
+
+.project-language[data-lang="csharp"],
+.project-language[data-lang="c#"],
+.project-language.csharp {
+    color: var(--csharp-color) !important;
+    border-color: var(--csharp-color) !important;
+}
+
+.project-language[data-lang="nodejs"],
+.project-language[data-lang="node"],
+.project-language.nodejs {
+    color: var(--node-color) !important;
+    border-color: var(--node-color) !important;
+}
+
+.project-language[data-lang="java"],
+.project-language.java {
+    color: var(--java-color) !important;
+    border-color: var(--java-color) !important;
+}
+
+.project-language[data-lang="typescript"],
+.project-language[data-lang="ts"],
+.project-language.typescript {
+    color: #3178c6 !important;
+    border-color: #3178c6 !important;
+}
+
+.project-language[data-lang="html"],
+.project-language.html {
+    color: #e34f26 !important;
+    border-color: #e34f26 !important;
+}
+
+.project-language[data-lang="css"],
+.project-language.css {
+    color: #1572b6 !important;
+    border-color: #1572b6 !important;
+}
+
+.project-language[data-lang="vue"],
+.project-language.vue {
+    color: #4fc08d !important;
+    border-color: #4fc08d !important;
+}
+
+.project-language[data-lang="react"],
+.project-language.react {
+    color: #61dafb !important;
+    border-color: #61dafb !important;
+}
+
+.project-language[data-lang="php"],
+.project-language.php {
+    color: #777bb4 !important;
+    border-color: #777bb4 !important;
+}
+
+.project-language[data-lang="go"],
+.project-language.go {
+    color: #00add8 !important;
+    border-color: #00add8 !important;
+}
+
+.project-language[data-lang="rust"],
+.project-language.rust {
+    color: #ce422b !important;
+    border-color: #ce422b !important;
 }
 
 .project-stats {

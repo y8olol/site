@@ -478,9 +478,13 @@ class ProfileLoader {
                         ? Math.round((bytes / repo.totalBytes) * 100)
                         : 0;
                     
-                    return `<span class="project-language" data-language="${lang.toLowerCase()}" title="${percentage}% of codebase">${lang}</span>`;
+                    // Get the lowercase language name for CSS class
+                    const langClass = lang.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    const langDataAttr = lang.toLowerCase();
+                    
+                    return `<span class="project-language ${langClass}" data-lang="${langDataAttr}" title="${percentage}% of codebase">${lang}</span>`;
                 }).join('')
-                : (repo.primaryLanguage ? `<span class="project-language" data-language="${repo.primaryLanguage.toLowerCase()}">${repo.primaryLanguage}</span>` : '');
+                : (repo.primaryLanguage ? `<span class="project-language ${repo.primaryLanguage.toLowerCase()}" data-lang="${repo.primaryLanguage.toLowerCase()}">${repo.primaryLanguage}</span>` : '');
             
             // Use description if available, otherwise generate one based on languages
             const description = repo.description || this.generateDescriptionFromLanguages(repo.languages, repo.primaryLanguage);
@@ -506,12 +510,21 @@ class ProfileLoader {
                     <p class="project-description">${description}</p>
                     ${statsHtml}
                     <div class="project-footer">
-                        <a href="${repo.html_url}" target="_blank" class="project-link">
-                            <span>View Project</span>
+                        <a href="${repo.html_url}" target="_blank" class="project-link project-button">
+                            <span>View Code</span>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M7 17L17 7M17 7H7M17 7V17"/>
                             </svg>
                         </a>
+                        ${repo.homepage ? `
+                        <a href="${repo.homepage}" target="_blank" class="project-link project-button demo-button">
+                            <span>Live Demo</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                            </svg>
+                        </a>
+                        ` : ''}
                         <div class="project-updated" title="Last updated: ${new Date(repo.updated_at).toLocaleDateString()}">
                             Updated ${this.getRelativeTime(repo.updated_at)}
                         </div>
@@ -564,12 +577,14 @@ class ProfileLoader {
                     </div>
                 </div>
                 <p class="project-description">${project.description}</p>
-                <a href="${project.url}" target="_blank" class="project-link">
-                    <span>View Project</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M7 17L17 7M17 7H7M17 7V17"/>
-                    </svg>
-                </a>
+                <div class="project-footer">
+                    <a href="${project.url}" target="_blank" class="project-link project-button">
+                        <span>View Code</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </a>
+                </div>
             </div>
         `).join('');
 
@@ -578,32 +593,32 @@ class ProfileLoader {
 
     generateDescriptionFromLanguages(languages, primaryLanguage) {
         if (!languages || Object.keys(languages).length === 0) {
-            return `A ${primaryLanguage || 'software'} project focused on automation and practical solutions.`;
+            return `${primaryLanguage || 'Software'} project with practical functionality.`;
         }
         
         const langNames = Object.keys(languages);
         const descriptions = {
-            'JavaScript': 'Interactive web application with modern JavaScript',
-            'Python': 'Automation and data processing tool',
-            'C#': 'Desktop application with modern UI',
-            'Java': 'Cross-platform application',
+            'JavaScript': 'Modern web application',
+            'Python': 'Automation and processing tool',
+            'C#': 'Desktop application',
+            'Java': 'Cross-platform app',
             'TypeScript': 'Type-safe web application',
-            'HTML': 'Web interface and user experience',
-            'CSS': 'Styled web interface',
-            'Go': 'High-performance backend service',
-            'Rust': 'Systems programming project',
-            'PHP': 'Web backend and API development',
-            'Ruby': 'Web application with Ruby framework',
-            'Swift': 'iOS/macOS native application',
-            'Kotlin': 'Android or multiplatform application'
+            'HTML': 'Web interface',
+            'CSS': 'Styled interface',
+            'Go': 'High-performance service',
+            'Rust': 'Systems programming',
+            'PHP': 'Web backend',
+            'Ruby': 'Web application',
+            'Swift': 'iOS/macOS app',
+            'Kotlin': 'Android application'
         };
         
         if (langNames.length === 1) {
-            return descriptions[primaryLanguage] || `${primaryLanguage} application with practical functionality`;
+            return descriptions[primaryLanguage] || `${primaryLanguage} application`;
         } else {
-            const primaryDesc = descriptions[primaryLanguage] || `${primaryLanguage} application`;
-            const otherLangs = langNames.filter(lang => lang !== primaryLanguage).slice(0, 2);
-            return `${primaryDesc} with ${otherLangs.join(' and ')} integration`;
+            const primaryDesc = descriptions[primaryLanguage] || `${primaryLanguage} app`;
+            const otherLangs = langNames.filter(lang => lang !== primaryLanguage).slice(0, 1);
+            return `${primaryDesc} with ${otherLangs[0]} integration`;
         }
     }
     
