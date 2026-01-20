@@ -1,0 +1,164 @@
+/* UNIVERSAL 3D EFFECTS - Cross-browser compatible with fallbacks */
+
+/* Force hardware acceleration for all browsers */
+.project-card,
+.tech-item,
+.social-link,
+.profile-card {
+    /* Standard 3D properties */
+    transform-style: preserve-3d !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
+    will-change: transform !important;
+    
+    /* Force hardware acceleration */
+    -webkit-transform-style: preserve-3d !important;
+    -webkit-backface-visibility: hidden !important;
+    -webkit-perspective: 1000px !important;
+    -moz-transform-style: preserve-3d !important;
+    -moz-backface-visibility: hidden !important;
+    -moz-perspective: 1000px !important;
+    
+    /* Ensure proper layering */
+    position: relative !important;
+    z-index: 1 !important;
+    
+    /* Smooth transitions for all browsers */
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+    -webkit-transition: -webkit-transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                        box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+    -moz-transition: -moz-transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                     box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+/* Progressive Enhancement - Fallback for browsers without 3D support */
+@supports not (transform-style: preserve-3d) {
+    .project-card:hover,
+    .tech-item:hover,
+    .social-link:hover {
+        /* Simple 2D fallback */
+        transform: translateY(-5px) scale(1.02) !important;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3) !important;
+    }
+}
+
+/* Enhanced 3D effects for modern browsers */
+@supports (transform-style: preserve-3d) {
+    /* Project Cards - Multi-directional 3D */
+    .project-card:hover {
+        transform: perspective(800px) rotateX(-8deg) rotateY(8deg) translateZ(20px) scale(1.03) !important;
+        -webkit-transform: perspective(800px) rotateX(-8deg) rotateY(8deg) translateZ(20px) scale(1.03) !important;
+        -moz-transform: perspective(800px) rotateX(-8deg) rotateY(8deg) translateZ(20px) scale(1.03) !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 25px rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* Tech Items */
+    .tech-item:hover {
+        transform: perspective(600px) rotateX(-6deg) rotateY(6deg) translateZ(15px) scale(1.05) !important;
+        -webkit-transform: perspective(600px) rotateX(-6deg) rotateY(6deg) translateZ(15px) scale(1.05) !important;
+        -moz-transform: perspective(600px) rotateX(-6deg) rotateY(6deg) translateZ(15px) scale(1.05) !important;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    /* Social Links */
+    .social-link:hover {
+        transform: perspective(400px) rotateX(-4deg) rotateY(4deg) translateZ(10px) scale(1.02) !important;
+        -webkit-transform: perspective(400px) rotateX(-4deg) rotateY(4deg) translateZ(10px) scale(1.02) !important;
+        -moz-transform: perspective(400px) rotateX(-4deg) rotateY(4deg) translateZ(10px) scale(1.02) !important;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25) !important;
+    }
+}
+
+/* Firefox-specific fixes */
+@-moz-document url-prefix() {
+    .project-card,
+    .tech-item,
+    .social-link {
+        /* Force hardware acceleration in Firefox */
+        transform: translateZ(0) !important;
+    }
+    
+    .project-card:hover {
+        transform: perspective(800px) rotateX(-8deg) rotateY(8deg) translateZ(20px) scale(1.03) !important;
+    }
+}
+
+/* Safari-specific fixes */
+@supports (-webkit-appearance: none) and (not (contain: paint)) {
+    .project-card,
+    .tech-item,
+    .social-link {
+        /* Safari often needs explicit 3D context */
+        -webkit-transform: translateZ(0) !important;
+        -webkit-font-smoothing: antialiased !important;
+    }
+}
+
+/* Edge/IE fallback */
+@supports (-ms-ime-align: auto) {
+    .project-card:hover,
+    .tech-item:hover,
+    .social-link:hover {
+        /* Simple transform for older Edge */
+        transform: translateY(-5px) scale(1.02) !important;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3) !important;
+    }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .project-card,
+    .tech-item,
+    .social-link {
+        transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+    }
+    
+    .project-card:hover,
+    .tech-item:hover,
+    .social-link:hover {
+        /* Simple lift instead of 3D rotation */
+        transform: translateY(-3px) scale(1.01) !important;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
+    }
+}
+
+/* Force enable on all browsers - Override browser detection */
+.force-3d-universal {
+    /* Universal 3D support */
+    transform-style: preserve-3d !important;
+    -webkit-transform-style: preserve-3d !important;
+    -moz-transform-style: preserve-3d !important;
+    -o-transform-style: preserve-3d !important;
+    -ms-transform-style: preserve-3d !important;
+    
+    perspective: 1000px !important;
+    -webkit-perspective: 1000px !important;
+    -moz-perspective: 1000px !important;
+    -o-perspective: 1000px !important;
+    -ms-perspective: 1000px !important;
+    
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+    -moz-backface-visibility: hidden !important;
+    -o-backface-visibility: hidden !important;
+    -ms-backface-visibility: hidden !important;
+}
+
+/* Debug styles to check what's working */
+.debug-3d {
+    border: 2px solid lime !important;
+    background: rgba(0, 255, 0, 0.1) !important;
+}
+
+.debug-3d::before {
+    content: '3D ACTIVE' !important;
+    position: absolute !important;
+    top: -20px !important;
+    left: 0 !important;
+    background: lime !important;
+    color: black !important;
+    font-size: 10px !important;
+    padding: 2px !important;
+    z-index: 9999 !important;
+}
