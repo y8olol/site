@@ -1,0 +1,75 @@
+/* DISABLE CLICK ANIMATIONS ON BACKGROUND WINDOWS */
+
+/* Remove all active/focus states from window backgrounds */
+.profile-card,
+.tech-stack-section,
+.projects-section {
+    /* Disable all click/active animations */
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+    outline: none !important;
+    border: 1px solid var(--border-color) !important; /* Keep static border */
+    transition: none !important; /* Remove all transitions */
+    transform: none !important; /* Remove any transforms */
+    user-select: none !important; /* Prevent text selection */
+}
+
+/* Remove focus/active/hover states */
+.profile-card:focus,
+.profile-card:active,
+.profile-card:hover,
+.tech-stack-section:focus,
+.tech-stack-section:active,
+.tech-stack-section:hover,
+.projects-section:focus,
+.projects-section:active,
+.projects-section:hover {
+    outline: none !important;
+    border: 1px solid var(--border-color) !important; /* Keep same border */
+    transform: none !important; /* No scaling or movement */
+    box-shadow: var(--shadow-strong) !important; /* Keep original shadow */
+    background: rgba(0, 0, 0, 0.3) !important; /* Keep original background */
+    transition: none !important;
+}
+
+/* Override any 3D effects on these containers */
+.profile-card,
+.tech-stack-section,
+.projects-section {
+    transform-style: flat !important;
+    will-change: auto !important;
+    backface-visibility: visible !important;
+    perspective: none !important;
+}
+
+/* Make sure content inside is still interactive */
+.profile-card *,
+.tech-stack-section *,
+.projects-section * {
+    pointer-events: auto !important;
+}
+
+/* But the container itself should not respond to clicks */
+.profile-card {
+    pointer-events: none !important;
+}
+
+.profile-card > * {
+    pointer-events: auto !important;
+}
+
+.tech-stack-section {
+    pointer-events: none !important;
+}
+
+.tech-stack-section > * {
+    pointer-events: auto !important;
+}
+
+.projects-section {
+    pointer-events: none !important;
+}
+
+.projects-section > * {
+    pointer-events: auto !important;
+}

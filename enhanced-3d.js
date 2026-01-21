@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (animationFrame) {
                     cancelAnimationFrame(animationFrame);
-                }\n                
+                }
                 animationFrame = requestAnimationFrame(() => {
                     element.style.transform = `
                         perspective(1000px) 
@@ -63,9 +63,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     const shadowBlur = 15 + Math.abs(rotateX) * 0.5 + Math.abs(rotateY) * 0.5;
                     
                     element.style.boxShadow = `
-                        ${shadowX.toFixed(1)}px ${shadowY.toFixed(1)}px ${shadowBlur.toFixed(1)}px rgba(0, 0, 0, 0.3),
-                        0 0 20px rgba(255, 255, 255, 0.1)
+                        ${shadowX.toFixed(1)}px ${shadowY.toFixed(1)}px ${shadowBlur.toFixed(1)}px rgba(0, 0, 0, 0.3)
                     `;
+                    // REMOVED: white glow to prevent sharp square appearance
                 });
             };
             

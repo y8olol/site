@@ -19,19 +19,19 @@ input:active {
 }
 
 :root {
-    /* Dynamic Theme Colors - Initially neutral until profile image loads */
+    /* Dynamic Theme Colors - Initially warm orange until profile image loads */
     --bg-primary: #0a0a0f;
     --bg-secondary: rgba(0, 0, 0, 0.3);
     --bg-tertiary: rgba(0, 0, 0, 0.3);
     --text-primary: #e0e6ed;
     --text-secondary: #a2a3a5;
     --text-muted: #6b7785;
-    --accent-primary: transparent; /* Start transparent until colors load */
-    --accent-secondary: transparent;
-    --accent-tertiary: transparent;
-    --gradient-primary: transparent;
+    --accent-primary: rgb(251, 146, 60); /* Default orange */
+    --accent-secondary: rgb(239, 68, 68); /* Default red */
+    --accent-tertiary: rgb(245, 158, 11); /* Default amber */
+    --gradient-primary: linear-gradient(135deg, rgb(251, 146, 60), rgb(239, 68, 68));
     --border-color: #000000;
-    --shadow-glow: 0 0 20px transparent;
+    --shadow-glow: 0 0 20px rgba(251, 146, 60, 0.3);
     --shadow-strong: 0 8px 32px rgba(0, 0, 0, 0.4);
     
     /* Language-specific colors */
@@ -251,8 +251,8 @@ body {
     height: calc(100% + 100px); /* Taller than viewport */
     pointer-events: none;
     background-image: 
-        linear-gradient(rgba(0, 212, 255, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 212, 255, 0.05) 1px, transparent 1px);
+        linear-gradient(rgba(251, 146, 60, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(251, 146, 60, 0.08) 1px, transparent 1px);
     background-size: 50px 50px;
     animation: gridMove 20s linear infinite;
     z-index: 0;
@@ -922,7 +922,7 @@ section {
     padding: 0.9rem;
     transition: all 0.3s ease;
     position: relative;
-    backdrop-filter: blur(5px);
+    backdrop-filter: none; /* Removed blur to prevent sharp square glow */
     transform-style: preserve-3d;
     will-change: transform;
     display: flex;

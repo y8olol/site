@@ -1,0 +1,79 @@
+/* DYNAMIC TEXT SCALING FOR PROJECT CARDS */
+
+/* Responsive project language tags - scale down when multiple */
+.project-languages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-top: 0.3rem;
+    margin-bottom: 0.4rem;
+    align-items: center;
+    overflow: hidden; /* Prevent overflow */
+}
+
+/* Dynamic sizing based on number of languages */
+.project-languages:has(.project-language:nth-child(4)) .project-language {
+    font-size: 0.5rem !important;
+    padding: 0.1rem 0.25rem !important;
+}
+
+.project-languages:has(.project-language:nth-child(3)) .project-language {
+    font-size: 0.52rem !important;
+    padding: 0.12rem 0.3rem !important;
+}
+
+/* Stats text scaling when multiple items */
+.project-stats {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+    padding: 0.25rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; /* Prevent wrapping, use ellipsis */
+}
+
+/* Description text scaling */
+.project-description {
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    line-height: 1.3;
+    margin-bottom: 0.4rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 2.7rem;
+    min-height: 1.3rem;
+    word-break: break-word; /* Better text wrapping */
+}
+
+/* Responsive adjustments for smaller cards */
+@media (max-width: 1200px) {
+    .project-language {
+        font-size: 0.5rem !important;
+        padding: 0.1rem 0.25rem !important;
+    }
+    
+    .project-stats {
+        font-size: 0.55rem;
+    }
+    
+    .project-description {
+        font-size: 0.65rem;
+        -webkit-line-clamp: 2; /* Fewer lines on smaller screens */
+        max-height: 1.8rem;
+    }
+}
+
+/* Fallback for browsers that don't support :has() */
+@supports not (selector(:has(*))) {
+    .project-language {
+        font-size: 0.52rem !important;
+        padding: 0.12rem 0.3rem !important;
+    }
+}
