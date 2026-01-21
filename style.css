@@ -21,6 +21,35 @@
     transition: all 0.3s ease;
 }
 
+/* Transparent scrollbars for projects section */
+.projects-grid,
+.projects-section {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+}
+
+.projects-grid::-webkit-scrollbar,
+.projects-section::-webkit-scrollbar {
+    width: 0px; /* Chrome/Safari/Opera - remove vertical scrollbar */
+    height: 0px; /* Chrome/Safari/Opera - remove horizontal scrollbar */
+    background: transparent;
+}
+
+.projects-grid::-webkit-scrollbar-track,
+.projects-section::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.projects-grid::-webkit-scrollbar-thumb,
+.projects-section::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+.projects-grid::-webkit-scrollbar-corner,
+.projects-section::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
 /* Remove default focus outlines and active states */
 *:focus,
 *:active,

@@ -68,15 +68,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     `;
                     // NO SCALING - removed scale() to prevent clipping
                     
-                    // Dynamic shadow based on rotation - more responsive to mouse
-                    const shadowIntensity = Math.sqrt(normalizedX * normalizedX + normalizedY * normalizedY);
-                    const shadowX = Math.max(-20, Math.min(20, normalizedX * 15));
-                    const shadowY = Math.max(8, Math.min(30, 15 + normalizedY * 8));
-                    const shadowBlur = 15 + shadowIntensity * 10;
-                    
-                    element.style.boxShadow = `
-                        ${shadowX.toFixed(1)}px ${shadowY.toFixed(1)}px ${shadowBlur.toFixed(1)}px rgba(0, 0, 0, 0.3)
-                    `;
+                    // Only apply dynamic shadow to NON-social elements to avoid CSS hover conflicts
+                    if (!element.classList.contains('social-link')) {
+                        // Dynamic shadow based on rotation - more responsive to mouse
+                        const shadowIntensity = Math.sqrt(normalizedX * normalizedX + normalizedY * normalizedY);
+                        const shadowX = Math.max(-20, Math.min(20, normalizedX * 15));
+                        const shadowY = Math.max(8, Math.min(30, 15 + normalizedY * 8));
+                        const shadowBlur = 15 + shadowIntensity * 10;
+                        
+                        element.style.boxShadow = `
+                            ${shadowX.toFixed(1)}px ${shadowY.toFixed(1)}px ${shadowBlur.toFixed(1)}px rgba(0, 0, 0, 0.3)
+                        `;
+                    }
                 });
             };
             
@@ -99,9 +102,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 element.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateX(0px) translateY(0px) translateZ(0px)';
                 // NO SCALING - removed scale(1) to prevent clipping
                 
-                // Reset shadow after transition
+                // Reset shadow after transition (but preserve CSS hover effects for social links)
                 setTimeout(() => {
-                    if (!isHovering) {
+                    if (!isHovering && !element.classList.contains('social-link')) {
                         element.style.boxShadow = '';
                     }
                 }, 400);
