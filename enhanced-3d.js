@@ -154,7 +154,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             socialLinks.forEach((link, index) => {
                 link.has3DEffect = false;
+                console.log(`🔗 Applying 3D effect to social link ${index + 1}: ${link.classList.toString()}`);
                 addEnhanced3DEffect(link, 0.6); // Very light intensity for social links
+                console.log(`✅ Enhanced 3D effect applied to social link ${index + 1}`);
             });
         } else {
             console.log('⚠️ Social links not found for enhanced 3D effects');
