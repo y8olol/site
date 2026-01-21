@@ -29,23 +29,34 @@ document.addEventListener('DOMContentLoaded', function() {
                 const mouseY = e.clientY;
                 
                 // Calculate rotation based on mouse position relative to card center
-                const maxRotation = 20; // Increased for more dramatic effect
-                const maxTranslation = 8;
+                const maxRotation = 15; // Reasonable rotation limit
+                const maxTranslation = 5;
                 
-                // More responsive rotations
+                // Normalize mouse position to -1 to 1 range
+                const normalizedX = (mouseX - centerX) / (rect.width / 2);
+                const normalizedY = (mouseY - centerY) / (rect.height / 2);
+                
+                // Apply intensity and create smooth rotations
+                // Invert Y for natural feel (mouse up = card tilts away)
                 const rotateX = Math.max(-maxRotation, Math.min(maxRotation, 
-                    (mouseY - centerY) / rect.height * -20 * intensity));
+                    normalizedY * maxRotation * -intensity));
                 const rotateY = Math.max(-maxRotation, Math.min(maxRotation, 
-                    (mouseX - centerX) / rect.width * 20 * intensity));
+                    normalizedX * maxRotation * intensity));
                 
+                // Subtle translation follows mouse
                 const translateX = Math.max(-maxTranslation, Math.min(maxTranslation,
-                    (mouseX - centerX) / rect.width * 6 * intensity));
+                    normalizedX * maxTranslation * intensity));
                 const translateY = Math.max(-maxTranslation, Math.min(maxTranslation,
-                    (mouseY - centerY) / rect.height * 6 * intensity));
+                    normalizedY * maxTranslation * intensity));
+                
+                // Debug logging for profile card (disabled)
+                // if (element.classList.contains('profile-card')) {
+                //     console.log(`Profile 3D: X:${normalizedX.toFixed(2)}, Y:${normalizedY.toFixed(2)}, RotX:${rotateX.toFixed(1)}, RotY:${rotateY.toFixed(1)}`);
+                // }
                 
                 if (animationFrame) {
                     cancelAnimationFrame(animationFrame);
-                }
+                }\n                
                 animationFrame = requestAnimationFrame(() => {
                     element.style.transform = `
                         perspective(1000px) 
@@ -57,15 +68,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     `;
                     // NO SCALING - removed scale() to prevent clipping
                     
-                    // Dynamic shadow based on rotation
-                    const shadowX = Math.max(-15, Math.min(15, rotateY * -0.8));
-                    const shadowY = Math.max(5, Math.min(25, rotateX * 0.8 + 15));
-                    const shadowBlur = 15 + Math.abs(rotateX) * 0.5 + Math.abs(rotateY) * 0.5;
+                    // Dynamic shadow based on rotation - more responsive to mouse
+                    const shadowIntensity = Math.sqrt(normalizedX * normalizedX + normalizedY * normalizedY);
+                    const shadowX = Math.max(-20, Math.min(20, normalizedX * 15));
+                    const shadowY = Math.max(8, Math.min(30, 15 + normalizedY * 8));
+                    const shadowBlur = 15 + shadowIntensity * 10;
                     
                     element.style.boxShadow = `
                         ${shadowX.toFixed(1)}px ${shadowY.toFixed(1)}px ${shadowBlur.toFixed(1)}px rgba(0, 0, 0, 0.3)
                     `;
-                    // REMOVED: white glow to prevent sharp square appearance
                 });
             };
             
@@ -126,6 +137,29 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
+        // Add 3D effects to profile card
+        const profileCard = document.querySelector('.profile-card');
+        if (profileCard) {
+            console.log('🃏 Applying enhanced 3D effects to profile card');
+            profileCard.has3DEffect = false;
+            addEnhanced3DEffect(profileCard, 0.8); // Lighter intensity for profile card
+        } else {
+            console.log('⚠️ Profile card not found for enhanced 3D effects');
+        }
+        
+        // Add 3D effects to social links
+        const socialLinks = document.querySelectorAll('.social-link');
+        if (socialLinks.length > 0) {
+            console.log(`🔗 Applying enhanced 3D effects to ${socialLinks.length} social links`);
+            
+            socialLinks.forEach((link, index) => {
+                link.has3DEffect = false;
+                addEnhanced3DEffect(link, 0.6); // Very light intensity for social links
+            });
+        } else {
+            console.log('⚠️ Social links not found for enhanced 3D effects');
+        }
+        
         console.log('✅ Enhanced 3D effects initialization complete!');
-    }, 500); // Wait 500ms for main script to finish
+    }, 1000); // Wait 1000ms to ensure all other scripts are done
 });

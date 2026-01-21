@@ -169,6 +169,11 @@
     font-size: 0.9rem;
     line-height: 1.5;
     margin: 0.5rem 0;
+    /* Enhanced: Full content display */
+    overflow: visible;
+    text-overflow: initial;
+    max-height: none;
+    transition: all 0.3s ease;
 }
 
 .project-link {
@@ -186,6 +191,9 @@
     white-space: nowrap;
     align-self: flex-start;
     margin-top: -0.5rem;
+    /* FIXED: Ensure links remain clickable */
+    pointer-events: auto !important;
+    user-select: auto;
 }
 
 .project-link:hover {

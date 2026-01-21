@@ -39,10 +39,6 @@ class ProfileLoader {
     async loadGitHubProfile() {
         try {
             console.log('🎨 Loading GitHub profile with dynamic theming...');
-            
-            // INSTANT FALLBACK: Apply default colors immediately
-            this.applyDefaultTheme();
-            
             const response = await fetch(`https://api.github.com/users/${this.github_username}`);
             
             if (response.ok) {
@@ -51,13 +47,13 @@ class ProfileLoader {
                 // Update profile image
                 const profileImg = document.getElementById('profile-image');
                 if (profileImg && profile.avatar_url) {
+                    // CORS FIX: Add crossorigin to enable color extraction
+                    profileImg.crossOrigin = 'anonymous';
                     profileImg.src = profile.avatar_url;
                     profileImg.alt = this.github_username;
                     
-                    // PARALLEL COLOR EXTRACTION: Don't block the UI
-                    this.attemptColorExtraction(profile.avatar_url).catch(() => {
-                        console.log('🎨 Color extraction failed, keeping default theme');
-                    });
+                    // Simple direct extraction first, then try advanced methods
+                    this.attemptDirectColorExtraction(profile.avatar_url);
                 }
 
                 // Update bio if available
@@ -73,76 +69,66 @@ class ProfileLoader {
             } else {
                 console.warn('Failed to load GitHub profile');
                 this.setFallbackImage();
-                // Default theme already applied
+                this.applySmartFallbackTheme('fallback');
             }
         } catch (error) {
             console.error('Error loading GitHub profile:', error);
             this.setFallbackImage();
-            // Default theme already applied
-        }
-    }
-    
-    applyDefaultTheme() {
-        // Apply warm orange theme immediately
-        console.log('🔥 Applying warm orange default theme...');
-        
-        const root = document.documentElement;
-        root.style.setProperty('--accent-primary', 'rgb(251, 146, 60)');
-        root.style.setProperty('--accent-secondary', 'rgb(239, 68, 68)'); 
-        root.style.setProperty('--accent-tertiary', 'rgb(245, 158, 11)');
-        root.style.setProperty('--gradient-primary', 'linear-gradient(135deg, rgb(251, 146, 60), rgb(239, 68, 68))');
-        root.style.setProperty('--shadow-glow', '0 0 20px rgba(251, 146, 60, 0.3)');
-        
-        // Update grid with orange
-        const bgGrid = document.querySelector('.bg-grid');
-        if (bgGrid) {
-            bgGrid.style.backgroundImage = `
-                linear-gradient(rgba(251, 146, 60, 0.08) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(251, 146, 60, 0.08) 1px, transparent 1px)
-            `;
-        }
-        
-        // Try color extraction immediately if image is already loaded
-        const profileImg = document.getElementById('profile-image');
-        if (profileImg && profileImg.src && profileImg.complete && profileImg.naturalWidth > 0) {
-            this.extractColorsFromLoadedImage(profileImg);
+            this.applySmartFallbackTheme('fallback');
         }
     }
 
-    extractColorsFromLoadedImage(img) {
-        console.log('🎨 Extracting colors from loaded image...');
+    async attemptDirectColorExtraction(avatarUrl) {
+        console.log('🎯 Attempting DIRECT color extraction with crossorigin fix...');
+        
         try {
-            this.colorExtractor.extractColorsFromImage(img, (colors) => {
-                if (colors && colors.length > 0) {
-                    console.log('✅ Successfully extracted colors from loaded image!');
-                    this.applyDynamicTheme(colors);
-                } else {
-                    console.log('⚠️ No colors extracted, using smart fallback');
-                    this.useAdvancedUrlColorAnalysis(img.src);
-                }
+            // Try direct approach with crossorigin first
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            
+            const success = await new Promise((resolve, reject) => {
+                const timeout = setTimeout(() => {
+                    reject(new Error('Direct extraction timeout'));
+                }, 3000); // 3 second timeout
+                
+                img.onload = () => {
+                    clearTimeout(timeout);
+                    try {
+                        this.colorExtractor.extractColorsFromImage(img, (colors) => {
+                            if (colors.length > 0) {
+                                console.log('🎉 SUCCESS: Direct color extraction worked!');
+                                this.applyDynamicTheme(colors);
+                                resolve(true);
+                            } else {
+                                reject(new Error('No colors extracted'));
+                            }
+                        });
+                    } catch (err) {
+                        reject(err);
+                    }
+                };
+                
+                img.onerror = () => {
+                    clearTimeout(timeout);
+                    reject(new Error('Direct image load failed'));
+                };
+                
+                img.src = avatarUrl;
             });
+            
+            return; // Success! No need for fallback methods
+            
         } catch (error) {
-            console.log('⚠️ Color extraction failed, using smart fallback');
-            this.useAdvancedUrlColorAnalysis(img.src);
+            console.log('⚠️ Direct extraction failed:', error.message);
+            console.log('🔄 Falling back to advanced methods...');
+            
+            // Fall back to the complex methods
+            this.attemptColorExtraction(avatarUrl);
         }
     }
 
     async attemptColorExtraction(avatarUrl) {
         console.log('🚀 Attempting advanced color extraction with CORS bypass...');
-        
-        // First try: direct extraction if image is already cached/loaded
-        const profileImg = document.getElementById('profile-image');
-        if (profileImg && profileImg.complete && profileImg.naturalWidth > 0) {
-            this.extractColorsFromLoadedImage(profileImg);
-            return;
-        }
-        
-        // Add onload listener for when image loads
-        if (profileImg) {
-            profileImg.onload = () => {
-                this.extractColorsFromLoadedImage(profileImg);
-            };
-        }
         
         // Method 1: Try different CORS proxies in sequence
         const corsProxies = [
@@ -306,45 +292,39 @@ class ProfileLoader {
     }
 
     useAdvancedUrlColorAnalysis(avatarUrl) {
-        console.log('🧠 Using advanced URL-based color fallback...');
+        console.log('🧠 Using advanced AI-like URL color analysis...');
         
-        // Extract user info for consistent color selection
-        const userId = this.github_username || 'y8o';
+        // Extract user ID from GitHub avatar URL
+        const userIdMatch = avatarUrl.match(/u\/(\d+)/);
+        const userId = userIdMatch ? parseInt(userIdMatch[1]) : this.hashCode(avatarUrl);
         
-        // WARM color themes - No blue!
+        // Advanced color themes based on mathematical patterns
         const advancedThemes = [
-            // Theme 0: Orange & Red
-            [{ r: 251, g: 146, b: 60 }, { r: 239, g: 68, b: 68 }],
-            // Theme 1: Purple & Pink
-            [{ r: 147, g: 51, b: 234 }, { r: 236, g: 72, b: 153 }],
-            // Theme 2: Green & Emerald  
-            [{ r: 52, g: 211, b: 153 }, { r: 16, g: 185, b: 129 }],
-            // Theme 3: Yellow & Orange
-            [{ r: 245, g: 158, b: 11 }, { r: 249, g: 115, b: 22 }],
-            // Theme 4: Red & Dark Red
-            [{ r: 220, g: 38, b: 38 }, { r: 185, g: 28, b: 28 }],
-            // Theme 5: Warm Purple & Magenta
-            [{ r: 168, g: 85, b: 247 }, { r: 217, g: 70, b: 239 }]
+            // Cyberpunk themes
+            [{ r: 0, g: 255, b: 255 }, { r: 255, g: 0, b: 150 }], // Cyan-Magenta
+            [{ r: 57, g: 255, b: 20 }, { r: 255, g: 206, b: 84 }], // Matrix Green-Gold
+            [{ r: 138, g: 43, b: 226 }, { r: 30, g: 144, b: 255 }], // Purple-DeepBlue
+            
+            // Synthwave themes  
+            [{ r: 255, g: 20, b: 147 }, { r: 0, g: 191, b: 255 }], // DeepPink-DeepSky
+            [{ r: 255, g: 69, b: 0 }, { r: 255, g: 215, b: 0 }], // Red-Gold
+            [{ r: 75, g: 0, b: 130 }, { r: 255, g: 20, b: 147 }], // Indigo-DeepPink
+            
+            // Neon themes
+            [{ r: 57, g: 255, b: 20 }, { r: 255, g: 255, b: 255 }], // Lime-White
+            [{ r: 255, g: 105, b: 180 }, { r: 64, g: 224, b: 208 }], // HotPink-Turquoise
+            [{ r: 255, g: 127, b: 80 }, { r: 255, g: 99, b: 71 }], // Coral-Tomato
+            
+            // Holographic themes
+            [{ r: 186, g: 85, b: 211 }, { r: 72, g: 209, b: 204 }], // MediumOrchid-MediumTurquoise
+            [{ r: 255, g: 182, b: 193 }, { r: 173, g: 216, b: 230 }], // LightPink-LightBlue
+            [{ r: 250, g: 128, b: 114 }, { r: 135, g: 206, b: 250 }], // Salmon-SkyBlue
         ];
         
-        // Select theme based on username for y8o specifically
-        let themeIndex;
-        if (userId.toLowerCase() === 'y8o' || userId.toLowerCase() === 'y8olol') {
-            // For y8o: use theme 0 (orange/red) for a warm distinctive look
-            themeIndex = 0; 
-        } else {
-            // For others: calculate based on username
-            let score = 0;
-            for (let i = 0; i < userId.length; i++) {
-                score += userId.charCodeAt(i) * (i + 1);
-            }
-            themeIndex = score % advancedThemes.length;
-        }
+        // Use mathematical selection for consistency
+        const selectedTheme = advancedThemes[Math.abs(userId) % advancedThemes.length];
         
-        const selectedTheme = advancedThemes[themeIndex];
-        
-        console.log(`🎨 Selected theme ${themeIndex} for ${userId}:`, selectedTheme);
-        
+        console.log(`🎨 Selected advanced theme ${Math.abs(userId) % advancedThemes.length} based on user pattern`);
         this.applyDynamicTheme(selectedTheme);
     }
 
@@ -352,6 +332,8 @@ class ProfileLoader {
         const profileImg = document.getElementById('profile-image');
         if (profileImg) {
             const fallbackUrl = `https://ui-avatars.com/api/?name=${this.github_username}&size=200&background=1a1a2e&color=00d4ff&bold=true&font-size=0.6`;
+            // CORS FIX: Add crossorigin for fallback image too
+            profileImg.crossOrigin = 'anonymous';
             profileImg.src = fallbackUrl;
             
             // Apply a cool default theme immediately

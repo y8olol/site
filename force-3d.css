@@ -1,4 +1,4 @@
-/* ENHANCED DYNAMIC 3D TRANSFORMS - CSS Backup with Multi-directional Effects */
+/* ENHANCED DYNAMIC 3D TRANSFORMS - JavaScript Controlled Only */
 .project-card {
     transform-style: preserve-3d !important;
     backface-visibility: hidden !important;
@@ -7,12 +7,8 @@
     transition: transform 0.2s ease-out, box-shadow 0.2s ease-out !important;
 }
 
-/* Multi-directional hover effect - responds to cursor position */
-.project-card:hover {
-    /* This will be overridden by JavaScript for dynamic effects */
-    transform: perspective(1000px) rotateX(-5deg) rotateY(5deg) translateZ(15px) scale(1.02) !important;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.1) !important;
-}
+/* CSS hover disabled - JavaScript handles all 3D effects */
+/* .project-card:hover { ... } */
 
 .tech-item {
     transform-style: preserve-3d !important;
@@ -22,10 +18,8 @@
     transition: transform 0.3s ease-out !important;
 }
 
-.tech-item:hover {
-    transform: perspective(1000px) rotateX(5deg) rotateY(5deg) translateZ(8px) scale(1.05) !important;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
-}
+/* CSS hover disabled - JavaScript handles all 3D effects */
+/* .tech-item:hover { ... } */
 
 .social-link {
     transform-style: preserve-3d !important;
@@ -35,7 +29,14 @@
     transition: transform 0.3s ease-out !important;
 }
 
-.social-link:hover {
-    transform: perspective(1000px) rotateX(3deg) rotateY(3deg) translateZ(5px) scale(1.02) !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2) !important;
+/* CSS hover disabled - JavaScript handles all 3D effects */
+/* .social-link:hover { ... } */
+
+/* Profile Card 3D Effects - Handled by JavaScript */
+.profile-card {
+    transform-style: preserve-3d !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
+    will-change: transform !important;
+    transition: transform 0.3s ease-out !important;
 }

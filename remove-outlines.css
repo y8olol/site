@@ -3,9 +3,16 @@
 /* Global outline reset - Remove all default browser outlines */
 *,
 *:before,
-*:after {
+*:after,
+*:focus,
+*:active,
+*:hover {
     outline: none !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    outline-color: transparent !important;
     -webkit-tap-highlight-color: transparent !important;
+    -webkit-focus-ring-color: transparent !important;
 }
 
 /* Remove default focus outlines and active states */
@@ -27,12 +34,37 @@ select:active {
     -webkit-tap-highlight-color: transparent !important;
 }
 
-/* Custom focus styles for accessibility - use dark theme colors */
+/* Custom focus styles for accessibility - COMPLETELY DISABLED for 3D cards */
+.tech-item,
 .tech-item:focus,
+.tech-item:active,
+.tech-item:hover,
+.project-card,
 .project-card:focus,
+.project-card:active,
+.project-card:hover,
+.social-link,
 .social-link:focus,
+.social-link:active,
+.social-link:hover,
+.profile-card,
+.profile-card:focus,
+.profile-card:active,
+.profile-card:hover {
+    outline: none !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    outline-color: transparent !important;
+    outline-offset: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-focus-ring-color: transparent !important;
+}
+
+/* Only show focus on buttons for accessibility */
 button:focus {
-    outline: 2px solid rgba(255, 255, 255, 0.3) !important;
+    outline: 1px solid rgba(0, 212, 255, 0.5) !important;
     outline-offset: 2px !important;
 }
 
@@ -65,7 +97,7 @@ textarea:focus,
 button:focus,
 a:focus {
     outline: 0 !important;
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.3) !important;
     border-color: var(--accent-primary, #00d4ff) !important;
 }
 
